@@ -1,8 +1,8 @@
 <?php
 $host = '127.0.0.1';      // o 'localhost'
 $puerto = '3307';         // puerto de xampp (antes era 3306, se cambio porque interferia con mariadb)
-$usuario = 'root';        // nombre de usuario de MySQL
-$contrasena = 'holasoyfran';         // contraseña del usuario root de MySQL
+$usuario = 'usuariopizzeria';        // nombre de usuario de MySQL
+$contrasena = 'V9p$Xz!rD7&bW#qLm@S3eT2^uNjF0yGhZwMkPvQa8RxCj';         // contraseña del usuario root de la base de datos
 $base_datos = 'pizzzaconmigo'; // nombre de la base de datos en phpmyadmin
 
 $conexion = new mysqli($host, $usuario, $contrasena, $base_datos, $puerto);
