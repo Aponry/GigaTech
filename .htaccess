@@ -1,3 +1,4 @@
 <Files "conexion.php">
     Require all denied
+    ErrorDocument 403 "No podes entrar a ver esto wachin, es privado"
 </Files>
