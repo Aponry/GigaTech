@@ -15,7 +15,7 @@ $tipos = ['pizza', 'bebida', 'hamburguesa', 'otro'];
       <input type="text" id="nombre" name="nombre" required />
     </div>
     <div>
-      <label for="tipo">Tipo de Producto 3dsahk</label><br/>
+      <label for="tipo">Tipo de Producto</label><br/>
       <select id="tipo" name="tipo" required>
         <option value="" selected disabled hidden>Seleccioná tipo</option>
         <?php foreach ($tipos as $t): ?>
