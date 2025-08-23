@@ -1,3 +1,0 @@
-<Files "conexion.php">
-    Require all denied
-</Files>
