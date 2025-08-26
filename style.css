@@ -1,17 +1,24 @@
 html {
     background-color: orange;
-    min-width: 60vh;
-    max-width: 60vh;
+  
 }
 
 header {
     background-color: black;
-    min-width: 20vh;
-    max-width: 20vh;
+    min-width: 100vh;
+    min-height: 20vh;
 }
 
 footer {
-    background-color: black;
-    min-width: 20vh;
-    max-width: 20vh;
+    background-color: rgb(121, 17, 17);
+    position: absolute;
+    bottom: 100%;
+
+    min-width: 100vh;
+    min-height: 20vh;
+}
+
+#logopizza {
+    position: relative;
+    right: 0%;
 }
