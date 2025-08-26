@@ -28,7 +28,7 @@ $conexion->close();
 </head>
 <body>
     
-<a href="index.php" class="text-sm text-blue-600 hover:underline">Volver atras</a>
+<a href="tabladeproductos.php" class="text-sm text-blue-600 hover:underline">Volver atras</a>
 
 </body>
 </html>
