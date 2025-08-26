@@ -18,7 +18,7 @@ include 'conexion.php';
 
 <header>
 
-<img id="logopizza" src="" alt="logo_pizzeria">
+<img id="logopizza" src="images/Logo Pizzeria.png" alt="logo_pizzeria">
 
 
 </header>
