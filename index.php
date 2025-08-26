@@ -20,6 +20,7 @@ include 'conexion.php';
 
 <img id="logopizza" src="images/Logo Pizzeria.png" alt="logo_pizzeria">
 
+<button id="botonperfil"> <img id="imgperfil" src="images/perfil.png" alt="foto empleado"></button>
 
 </header>
 
