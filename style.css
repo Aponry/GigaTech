@@ -1,0 +1,17 @@
+html {
+    background-color: orange;
+    min-width: 60vh;
+    max-width: 60vh;
+}
+
+header {
+    background-color: black;
+    min-width: 20vh;
+    max-width: 20vh;
+}
+
+footer {
+    background-color: black;
+    min-width: 20vh;
+    max-width: 20vh;
+}
