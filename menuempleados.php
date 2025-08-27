@@ -14,6 +14,20 @@ include 'conexion.php';
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    
+    <div class="prods">
+
+        <button>Abrir menu de Productos</button>
+
+    </div>
+    <div class="peds">
+
+<button>Abrir menu de Pedidos </button>
+
+    </div>
+    <div class="datos">
+
+<button>Abrir menu de Estadisticas </button>
+
+    </div>
 </body>
 </html>
