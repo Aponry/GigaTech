@@ -14,6 +14,11 @@ $stmt->bind_param('i', $id);
 if ($stmt->execute()) {
     echo json_encode(['ok' => true, 'rows' => $stmt->affected_rows]);
 } else {
-    http_response_code(500);
-    echo json_encode(['ok' => false, 'error' => $conexion->error]);
+    if ($conexion->errno == 1451) {
+        echo json_encode(['ok' => false, 'error' => 'No se puede borrar, el producto está en una promoción']);
+    } else {
+        http_response_code(500);
+        echo json_encode(['ok' => false, 'error' => $conexion->error]);
+    }
 }
+

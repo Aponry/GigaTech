@@ -87,10 +87,19 @@ $tipos = $matches[1];
         });
 
         document.getElementById('borrar').addEventListener('click', () => {
-            if (!confirm('Borrar?')) return;
-            let f = new FormData(); f.append('id_producto', p.id_producto);
-            fetch('borrar.php', { method: 'POST', body: f }).then(() => location.reload());
+    if (!confirm('Borrar?')) return;
+    let f = new FormData(); 
+    f.append('id_producto', p.id_producto);
+    fetch('borrar.php', { method: 'POST', body: f })
+        .then(res => res.json())
+        .then(data => {
+            if(!data.ok){
+                alert(data.error); 
+            } else {
+                location.reload(); // sin esta cagada no se actualiza la pagina al borrar un producto, por favor, no borrar bajo ninguna circunstancia 
+            }
         });
+});
     }
 
     document.getElementById('ver').addEventListener('click', verLista);
