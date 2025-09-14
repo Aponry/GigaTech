@@ -31,13 +31,19 @@ $tipos = $matches[1];
 
                 let tabla = document.createElement('table');
                 let encabezado = tabla.insertRow();
-                ['ID', 'Nombre', 'Tipo', 'Precio', 'Descripción', 'Acciones'].forEach(h => {
+                ['ID', 'Imagen', 'Nombre', 'Tipo', 'Precio', 'Descripción', 'Acciones'].forEach(h => {
                     let th = document.createElement('th'); th.innerText = h; encabezado.appendChild(th);
                 });
 
                 datos.forEach(p => {
                     let fila = tabla.insertRow();
-                    [p.id_producto, p.nombre, p.tipo, p.precio_base, p.descripcion].forEach(d => {
+                    let celId = fila.insertCell(); celId.innerText = p.id_producto;
+                    let celImagen = fila.insertCell();
+                    let imgEl = document.createElement('img');
+                    imgEl.src = p.imagen ? ('../../' + p.imagen) : '../../images/perfil.png';
+                    imgEl.style.width = '60px'; imgEl.style.height = '60px'; imgEl.style.objectFit = 'cover';
+                    celImagen.appendChild(imgEl);
+                    [p.nombre, p.tipo, p.precio_base, p.descripcion].forEach(d => {
                         let cel = fila.insertCell(); cel.innerText = d;
                     });
                     let celAcc = fila.insertCell();
@@ -46,6 +52,7 @@ $tipos = $matches[1];
                     celAcc.appendChild(btn);
                 });
 
+
                 lista.appendChild(tabla);
             });
     }
@@ -53,13 +60,16 @@ $tipos = $matches[1];
     document.getElementById('agregar').addEventListener('click', () => {
         let s = '<select name="tipo">';
         tipos.forEach(t => s += `<option value="${t}">${t}</option>`); s += '</select>';
-        document.getElementById('formulario').innerHTML = `<form id="formAgregar">
-        <input name="nombre" placeholder="Nombre">
-        ${s}
-        <input name="precio" placeholder="Precio">
-        <input name="descripcion" placeholder="Descripción">
-        <button>Agregar</button>
-    </form>`;
+        document.getElementById('formulario').innerHTML = `<form id="formAgregar" enctype="multipart/form-data">
+    <input name="nombre" placeholder="Nombre" required>
+    ${s}
+    <input name="precio" placeholder="Precio" required>
+    <input name="descripcion" placeholder="Descripción">
+    <input type="file" name="imagen" accept="image/*" required onchange="document.getElementById('previewAgregar').src = window.URL.createObjectURL(this.files[0])">
+    <img id="previewAgregar" style="width:60px;height:60px;object-fit:cover;margin-top:5px;">
+    <button>Agregar</button>
+</form>`;
+
         document.getElementById('lista').innerHTML = '';
 
         document.getElementById('formAgregar').addEventListener('submit', e => {
@@ -71,15 +81,19 @@ $tipos = $matches[1];
     function editar(p) {
         let s = '<select name="tipo">';
         tipos.forEach(t => s += `<option value="${t}" ${t === p.tipo ? 'selected' : ''}>${t}</option>`); s += '</select>';
-        document.getElementById('formulario').innerHTML = `<form id="formEditar">
-        <input type="hidden" name="id_producto" value="${p.id_producto}">
-        <input name="nombre" value="${p.nombre}" placeholder="Nombre">
-        ${s}
-        <input name="precio" value="${p.precio_base}" placeholder="Precio">
-        <input name="descripcion" value="${p.descripcion}" placeholder="Descripción">
-        <button>Guardar</button>
-        <button type="button" id="borrar">Borrar</button>
-    </form>`;
+        document.getElementById('formulario').innerHTML = `<form id="formEditar" enctype="multipart/form-data">
+    <input type="hidden" name="id_producto" value="${p.id_producto}">
+    <input name="nombre" value="${p.nombre}" placeholder="Nombre" required>
+    ${s}
+    <input name="precio" value="${p.precio_base}" placeholder="Precio" required>
+    <input name="descripcion" value="${p.descripcion}" placeholder="Descripción">
+    <div>Imagen actual: <img id="previewEditar" src="${p.imagen ? ('../../' + p.imagen) : '../../images/perfil.png'}" style="width:60px;height:60px;object-fit:cover;"></div>
+    <input type="file" name="imagen" accept="image/*" onchange="document.getElementById('previewEditar').src = window.URL.createObjectURL(this.files[0])">
+    <button>Guardar</button>
+    <button type="button" id="borrar">Borrar</button>
+</form>`;
+
+
 
         document.getElementById('formEditar').addEventListener('submit', e => {
             e.preventDefault();
@@ -87,19 +101,19 @@ $tipos = $matches[1];
         });
 
         document.getElementById('borrar').addEventListener('click', () => {
-    if (!confirm('Borrar?')) return;
-    let f = new FormData(); 
-    f.append('id_producto', p.id_producto);
-    fetch('borrar.php', { method: 'POST', body: f })
-        .then(res => res.json())
-        .then(data => {
-            if(!data.ok){
-                alert(data.error); 
-            } else {
-                location.reload(); // sin esta cagada no se actualiza la pagina al borrar un producto, por favor, no borrar bajo ninguna circunstancia 
-            }
+            if (!confirm('Borrar?')) return;
+            let f = new FormData();
+            f.append('id_producto', p.id_producto);
+            fetch('borrar.php', { method: 'POST', body: f })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) {
+                        alert(data.error);
+                    } else {
+                        location.reload(); // sin esta cagada no se actualiza la pagina al borrar un producto, por favor, no borrar bajo ninguna circunstancia 
+                    }
+                });
         });
-});
     }
 
     document.getElementById('ver').addEventListener('click', verLista);

@@ -15,8 +15,17 @@ if ($nombre === '' || !in_array($tipo, $allowed) || !is_numeric($precio)) {
 }
 
 $precio = number_format((float) $precio, 2, '.', '');
-$stmt = $conexion->prepare("INSERT INTO productos (nombre,tipo,precio_base,descripcion) VALUES (?,?,?,?)");
-$stmt->bind_param('ssds', $nombre, $tipo, $precio, $descripcion);
+$imagenRuta = '';
+if (!empty($_FILES['imagen']['name'])) {
+    $nombreArchivo = time().'_'.basename($_FILES['imagen']['name']);
+    $destino = __DIR__.'/img/'.$nombreArchivo;
+    if (move_uploaded_file($_FILES['imagen']['tmp_name'], $destino)) {
+        $imagenRuta = 'empleado/productos/img/'.$nombreArchivo;
+    }
+}
+
+$stmt = $conexion->prepare("INSERT INTO productos (nombre,tipo,precio_base,descripcion,imagen) VALUES (?,?,?,?,?)");
+$stmt->bind_param('ssdss', $nombre, $tipo, $precio, $descripcion, $imagenRuta);
 if ($stmt->execute()) {
     echo json_encode(['ok' => true, 'id' => $conexion->insert_id]);
 } else {
