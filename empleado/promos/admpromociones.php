@@ -2,7 +2,8 @@
 require_once __DIR__ . '/../../conexion.php';
 $prodRes = $conexion->query("SELECT id_producto,nombre FROM productos ORDER BY nombre");
 $productos = [];
-while($r = $prodRes->fetch_assoc()) $productos[] = $r;
+while ($r = $prodRes->fetch_assoc())
+    $productos[] = $r;
 ?>
 
 <h1>Promociones</h1>
@@ -15,183 +16,216 @@ while($r = $prodRes->fetch_assoc()) $productos[] = $r;
 <div id="lista"></div>
 
 <script>
-const productos = <?php echo json_encode($productos); ?>;
+    const productos = <?php echo json_encode($productos); ?>;
 
-function productosDePromo(promo) {
-    if(!promo.productos) return '';
-    return promo.productos.split(',').map(item=>{
-        let [id,cant] = item.split(':');
-        let prod = productos.find(pr => pr.id_producto == id);
-        return prod ? `${prod.nombre} x ${cant}` : '';
-    }).join(', ');
-}
-
-function verLista() {
-    fetch('listar.php')
-    .then(r => r.json())
-    .then(datos => {
-        const lista = document.getElementById('lista');
-        lista.innerHTML = '';
-        document.getElementById('formulario').innerHTML = '';
-
-        if(!datos.length){ lista.innerText='No hay promociones'; return; }
-
-        let tabla = document.createElement('table');
-        let encabezado = tabla.insertRow();
-        ['ID','Nombre','Precio','Productos','Acciones'].forEach(h => {
-            let th = document.createElement('th'); th.innerText = h; encabezado.appendChild(th);
-        });
-
-        datos.forEach(promo => {
-            let fila = tabla.insertRow();
-            fila.insertCell().innerText = promo.id_promocion;
-            fila.insertCell().innerText = promo.nombre;
-            fila.insertCell().innerText = promo.precio;
-            fila.insertCell().innerText = productosDePromo(promo);
-
-            let celAcc = fila.insertCell();
-            let boton = document.createElement('button');
-            boton.innerText = 'Editar/Borrar';
-            boton.addEventListener('click', ()=>mostrarFormulario(promo));
-            celAcc.appendChild(boton);
-        });
-
-        lista.appendChild(tabla);
-    });
-}
-
-function mostrarFormulario(promo=null){
-    let seleccionados = [];
-
-    if(promo && promo.productos){
-        promo.productos.split(',').forEach(item=>{
-            let [id,cant] = item.split(':');
-            let prod = productos.find(pr=>pr.id_producto==id);
-            if(prod) seleccionados.push({id:id, nombre:prod.nombre, cantidad:parseInt(cant)});
-        });
+    function productosDePromo(promo) {
+        if (!promo.productos) return '';
+        return promo.productos.split(',').map(item => {
+            let [id, cant] = item.split(':');
+            let prod = productos.find(pr => pr.id_producto == id);
+            return prod ? `${prod.nombre} x ${cant}` : '';
+        }).join(', ');
     }
 
-    const contenedor = document.getElementById('formulario');
-    contenedor.innerHTML = '';
+    function verLista() {
+        fetch('listar.php')
+            .then(r => r.json())
+            .then(datos => {
+                const lista = document.getElementById('lista');
+                lista.innerHTML = '';
+                document.getElementById('formulario').innerHTML = '';
+                if (!datos.length) {
+                    lista.innerText = 'No hay promociones';
+                    return;
+                }
+                let tabla = document.createElement('table');
+                let encabezado = tabla.insertRow();
+                ['ID', 'Imagen', 'Nombre', 'Precio', 'Descripción', 'Productos', 'Acciones'].forEach(h => {
+                    let th = document.createElement('th');
+                    th.innerText = h;
+                    encabezado.appendChild(th);
+                });
 
-    const form = document.createElement('form');
-    form.id = 'formPromo';
+                datos.forEach(promo => {
+                    let fila = tabla.insertRow();
+                    fila.insertCell().innerText = promo.id_promocion;
 
-    if(promo) {
-        const inputId = document.createElement('input');
-        inputId.type = 'hidden';
-        inputId.name = 'id_promocion';
-        inputId.value = promo.id_promocion;
-        form.appendChild(inputId);
+                    let celImg = fila.insertCell();
+                    let img = document.createElement('img');
+                    img.src = promo.imagen ? promo.imagen : '../../images/perfil.png';
+                    img.style.width = '60px';
+                    img.style.height = '60px';
+                    img.style.objectFit = 'cover';
+                    celImg.appendChild(img);
+
+                    fila.insertCell().innerText = promo.nombre;
+                    fila.insertCell().innerText = promo.precio;
+                    fila.insertCell().innerText = promo.descripcion ?? '';
+                    fila.insertCell().innerText = productosDePromo(promo);
+
+                    let celAcc = fila.insertCell();
+                    let boton = document.createElement('button');
+                    boton.innerText = 'Editar/Borrar';
+                    boton.addEventListener('click', () => mostrarFormulario(promo));
+                    celAcc.appendChild(boton);
+                });
+
+                lista.appendChild(tabla);
+            });
     }
 
-    const inputNombre = document.createElement('input');
-    inputNombre.name = 'nombre';
-    inputNombre.placeholder = 'Nombre';
-    inputNombre.value = promo ? promo.nombre : '';
-    form.appendChild(inputNombre);
+    function mostrarFormulario(promo = null) {
+        let seleccionados = [];
 
-    const inputPrecio = document.createElement('input');
-    inputPrecio.name = 'precio';
-    inputPrecio.placeholder = 'Precio';
-    inputPrecio.value = promo ? promo.precio : '';
-    form.appendChild(inputPrecio);
-
-    const inputDesc = document.createElement('input');
-    inputDesc.name = 'descripcion';
-    inputDesc.placeholder = 'Descripción';
-    inputDesc.value = promo ? promo.descripcion : '';
-    form.appendChild(inputDesc);
-
-    const divProd = document.createElement('div');
-    const selectProd = document.createElement('select');
-    const optDefault = document.createElement('option');
-    optDefault.value = '';
-    optDefault.innerText = 'Elegir producto';
-    selectProd.appendChild(optDefault);
-
-    productos.forEach(p=>{
-        const o = document.createElement('option');
-        o.value = p.id_producto;
-        o.innerText = p.nombre;
-        selectProd.appendChild(o);
-    });
-
-    const inputCant = document.createElement('input');
-    inputCant.type = 'number';
-    inputCant.min = 1;
-    inputCant.value = 1;
-
-    const btnAgregarProd = document.createElement('button');
-    btnAgregarProd.type = 'button';
-    btnAgregarProd.innerText = 'Agregar';
-
-    const divElegidos = document.createElement('div');
-
-    btnAgregarProd.addEventListener('click', ()=>{
-        const id = selectProd.value;
-        const cant = parseInt(inputCant.value);
-        if(!id || cant <= 0) return;
-        let existente = seleccionados.find(p=>p.id==id);
-        if(existente) existente.cantidad += cant;
-        else {
-            let prod = productos.find(pr=>pr.id_producto==id);
-            seleccionados.push({id:id, nombre:prod.nombre, cantidad:cant});
+        if (promo && promo.productos) {
+            promo.productos.split(',').forEach(item => {
+                let [id, cant] = item.split(':');
+                let prod = productos.find(pr => pr.id_producto == id);
+                if (prod) seleccionados.push({ id: id, nombre: prod.nombre, cantidad: parseInt(cant) });
+            });
         }
+
+        const contenedor = document.getElementById('formulario');
+        contenedor.innerHTML = '';
+
+
+        const form = document.createElement('form');
+        form.id = 'formPromo';
+        form.enctype = 'multipart/form-data';
+
+        if (promo) {
+            const inputId = document.createElement('input');
+            inputId.type = 'hidden';
+            inputId.name = 'id_promocion';
+            inputId.value = promo.id_promocion;
+            form.appendChild(inputId);
+        }
+
+        const inputNombre = document.createElement('input');
+        inputNombre.name = 'nombre'; inputNombre.placeholder = 'Nombre';
+        inputNombre.value = promo ? promo.nombre : '';
+        form.appendChild(inputNombre);
+
+        const inputPrecio = document.createElement('input');
+        inputPrecio.name = 'precio'; inputPrecio.placeholder = 'Precio';
+        inputPrecio.value = promo ? promo.precio : '';
+        form.appendChild(inputPrecio);
+
+        const inputDesc = document.createElement('input');
+        inputDesc.name = 'descripcion'; inputDesc.placeholder = 'Descripción';
+        inputDesc.value = promo ? promo.descripcion : '';
+        form.appendChild(inputDesc);
+
+        const inputImagen = document.createElement('input');
+        inputImagen.type = 'file';
+        inputImagen.name = 'imagen';
+        inputImagen.accept = 'image/*';
+        if (!promo) inputImagen.required = true;
+        inputImagen.onchange = () => {
+            const preview = document.getElementById('previewPromo');
+            if (preview) preview.src = window.URL.createObjectURL(inputImagen.files[0]);
+        };
+        form.appendChild(inputImagen);
+
+        const imgPreview = document.createElement('img');
+        imgPreview.id = 'previewPromo';
+        imgPreview.style.width = '80px';
+        imgPreview.style.height = '80px';
+        imgPreview.style.objectFit = 'cover';
+        imgPreview.style.marginTop = '6px';
+        imgPreview.src = promo && promo.imagen ? promo.imagen : '../../images/perfil.png';
+
+        form.appendChild(imgPreview);
+
+        const divProd = document.createElement('div');
+        const selectProd = document.createElement('select');
+        const optDefault = document.createElement('option');
+        optDefault.value = '';
+        optDefault.innerText = 'Elegir producto';
+        selectProd.appendChild(optDefault);
+
+        productos.forEach(p => {
+            const o = document.createElement('option');
+            o.value = p.id_producto;
+            o.innerText = p.nombre;
+            selectProd.appendChild(o);
+        });
+
+        const inputCant = document.createElement('input');
+        inputCant.type = 'number';
+        inputCant.min = 1;
+        inputCant.value = 1;
+
+        const btnAgregarProd = document.createElement('button');
+        btnAgregarProd.type = 'button';
+        btnAgregarProd.innerText = 'Agregar';
+
+        const divElegidos = document.createElement('div');
+
+        btnAgregarProd.addEventListener('click', () => {
+            const id = selectProd.value;
+            const cant = parseInt(inputCant.value);
+            if (!id || cant <= 0) return;
+            let existente = seleccionados.find(p => p.id == id);
+            if (existente) existente.cantidad += cant;
+            else {
+                let prod = productos.find(pr => pr.id_producto == id);
+                seleccionados.push({ id: id, nombre: prod.nombre, cantidad: cant });
+            }
+            actualizarLista();
+        });
+
+        function actualizarLista() {
+            divElegidos.innerHTML = '';
+            seleccionados.forEach((p, i) => {
+                const fila = document.createElement('div');
+                fila.innerText = `${p.nombre} x ${p.cantidad} `;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.innerText = 'Quitar';
+                btn.addEventListener('click', () => { seleccionados.splice(i, 1); actualizarLista(); });
+                fila.appendChild(btn);
+                divElegidos.appendChild(fila);
+            });
+        }
+
+        divProd.appendChild(selectProd);
+        divProd.appendChild(inputCant);
+        divProd.appendChild(btnAgregarProd);
+        divProd.appendChild(divElegidos);
+
+        form.appendChild(divProd);
+
+        const btnSubmit = document.createElement('button');
+        btnSubmit.innerText = promo ? 'Guardar' : 'Agregar';
+        form.appendChild(btnSubmit);
+
+        if (promo) {
+            const btnBorrar = document.createElement('button');
+            btnBorrar.type = 'button';
+            btnBorrar.innerText = 'Borrar';
+            btnBorrar.addEventListener('click', () => {
+                if (!confirm('Borrar?')) return;
+                const f = new FormData();
+                f.append('id_promocion', promo.id_promocion);
+                fetch('borrar.php', { method: 'POST', body: f }).then(() => location.reload());
+            });
+            form.appendChild(btnBorrar);
+        }
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            seleccionados.forEach(p => formData.append(`productos[${p.id}]`, p.cantidad));
+            fetch(promo ? 'act.php' : 'añadir.php', { method: 'POST', body: formData })
+                .then(() => location.reload());
+        });
+
+        contenedor.appendChild(form);
         actualizarLista();
-    });
-
-    function actualizarLista(){
-        divElegidos.innerHTML = '';
-        seleccionados.forEach((p,i)=>{
-            const fila = document.createElement('div');
-            fila.innerText = `${p.nombre} x ${p.cantidad} `;
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.innerText = 'Quitar';
-            btn.addEventListener('click', ()=>{ seleccionados.splice(i,1); actualizarLista(); });
-            fila.appendChild(btn);
-            divElegidos.appendChild(fila);
-        });
     }
 
-    divProd.appendChild(selectProd);
-    divProd.appendChild(inputCant);
-    divProd.appendChild(btnAgregarProd);
-    divProd.appendChild(divElegidos);
-
-    form.appendChild(divProd);
-
-    const btnSubmit = document.createElement('button');
-    btnSubmit.innerText = promo ? 'Guardar' : 'Agregar';
-    form.appendChild(btnSubmit);
-
-    if(promo){
-        const btnBorrar = document.createElement('button');
-        btnBorrar.type = 'button';
-        btnBorrar.innerText = 'Borrar';
-        btnBorrar.addEventListener('click', ()=>{
-            if(!confirm('Borrar?')) return;
-            const f = new FormData();
-            f.append('id_promocion', promo.id_promocion);
-            fetch('borrar.php',{method:'POST',body:f}).then(()=>location.reload());
-        });
-        form.appendChild(btnBorrar);
-    }
-
-    form.addEventListener('submit', e=>{
-        e.preventDefault();
-        const formData = new FormData(form);
-        seleccionados.forEach(p=>formData.append(`productos[${p.id}]`, p.cantidad));
-        fetch(promo ? 'act.php' : 'añadir.php',{method:'POST',body:formData})
-        .then(()=>location.reload());
-    });
-
-    contenedor.appendChild(form);
-    actualizarLista();
-}
-
-document.getElementById('nuevo').addEventListener('click', ()=>mostrarFormulario());
-document.getElementById('mostrar').addEventListener('click', verLista);
-verLista();
+    document.getElementById('nuevo').addEventListener('click', () => mostrarFormulario());
+    document.getElementById('mostrar').addEventListener('click', verLista);
+    verLista();
 </script>
