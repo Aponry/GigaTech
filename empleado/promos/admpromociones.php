@@ -65,7 +65,7 @@ while ($r = $prodRes->fetch_assoc())
 
                     let celAcc = fila.insertCell();
                     let boton = document.createElement('button');
-                    boton.innerText = 'Editar/Borrar';
+                    boton.innerText = 'Editar';
                     boton.addEventListener('click', () => mostrarFormulario(promo));
                     celAcc.appendChild(boton);
                 });
