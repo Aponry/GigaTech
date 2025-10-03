@@ -24,6 +24,7 @@ if ($prod_res) {
     while ($r = $prod_res->fetch_assoc())
         $productos[] = $r;
 }
+//praelcocofjrkg
 ?>
 <!doctype html>
 <html lang="es">
@@ -121,3 +122,4 @@ if ($prod_res) {
 </body>
 
 </html>
+#d
