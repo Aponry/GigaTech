@@ -11,7 +11,7 @@ while ($r = $prodRes->fetch_assoc())
 <link rel="stylesheet" href="style.css">
 <h1>Promociones</h1>
 
-<button onclick="location.href='../menu1.html'">Volver</button>
+<button onclick="location.href='../menu.php'">Volver</button>
 <button id="btnAgregar">Agregar</button>
 <button id="btnVer">Ver</button>
 
