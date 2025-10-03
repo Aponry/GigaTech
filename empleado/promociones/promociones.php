@@ -1,16 +1,19 @@
 <?php
 require_once __DIR__ . '/../../conexion.php';
-$prodRes = $conexion->query("SELECT id_producto,nombre FROM productos ORDER BY nombre");
+
+// Traer productos para seleccionar en la promo
+$prodRes = $conexion->query("SELECT id_producto, nombre FROM productos ORDER BY nombre");
 $productos = [];
 while ($r = $prodRes->fetch_assoc())
     $productos[] = $r;
 ?>
 
+<link rel="stylesheet" href="style.css">
 <h1>Promociones</h1>
 
 <button onclick="location.href='../menu1.html'">Volver</button>
-<button id="nuevo">Agregar</button>
-<button id="mostrar">Ver</button>
+<button id="btnAgregar">Agregar</button>
+<button id="btnVer">Ver</button>
 
 <div id="formulario"></div>
 <div id="lista"></div>
@@ -18,32 +21,19 @@ while ($r = $prodRes->fetch_assoc())
 <script>
     const productos = <?php echo json_encode($productos); ?>;
 
-    function productosDePromo(promo) {
-        if (!promo.productos) return '';
-        return promo.productos.split(',').map(item => {
-            let [id, cant] = item.split(':');
-            let prod = productos.find(pr => pr.id_producto == id);
-            return prod ? `${prod.nombre} x ${cant}` : '';
-        }).join(', ');
-    }
-
     function verLista() {
-        fetch('listar.php')
+        fetch('listar_promociones.php')
             .then(r => r.json())
             .then(datos => {
                 const lista = document.getElementById('lista');
                 lista.innerHTML = '';
                 document.getElementById('formulario').innerHTML = '';
-                if (!datos.length) {
-                    lista.innerText = 'No hay promociones';
-                    return;
-                }
+                if (!datos.length) { lista.innerText = 'No hay promociones'; return; }
+
                 let tabla = document.createElement('table');
                 let encabezado = tabla.insertRow();
-                ['ID', 'Imagen', 'Nombre', 'Precio', 'Descripción', 'Productos', 'Acciones'].forEach(h => {
-                    let th = document.createElement('th');
-                    th.innerText = h;
-                    encabezado.appendChild(th);
+                ['ID', 'Imagen', 'Nombre', 'Precio', 'Descripción', 'Productos', 'Activo', 'Acciones'].forEach(h => {
+                    let th = document.createElement('th'); th.innerText = h; encabezado.appendChild(th);
                 });
 
                 datos.forEach(promo => {
@@ -61,13 +51,25 @@ while ($r = $prodRes->fetch_assoc())
                     fila.insertCell().innerText = promo.nombre;
                     fila.insertCell().innerText = promo.precio;
                     fila.insertCell().innerText = promo.descripcion ?? '';
-                    fila.insertCell().innerText = productosDePromo(promo);
+
+                    let celProds = fila.insertCell();
+                    if (promo.productos) {
+                        celProds.innerText = promo.productos.map(p => `${p.nombre} x ${p.cantidad}`).join(', ');
+                    } else celProds.innerText = '';
+
+                    let celActivo = fila.insertCell();
+                    const chk = document.createElement('input');
+                    chk.type = 'checkbox';
+                    chk.checked = promo.activo == 1;
+                    chk.addEventListener('change', () => {
+                        fetch('editar_promocion.php', { method: 'POST', body: new URLSearchParams({ id_promocion: promo.id_promocion, activo: chk.checked ? 1 : 0 }) });
+                    });
+                    celActivo.appendChild(chk);
 
                     let celAcc = fila.insertCell();
-                    let boton = document.createElement('button');
-                    boton.innerText = 'Editar';
-                    boton.addEventListener('click', () => mostrarFormulario(promo));
-                    celAcc.appendChild(boton);
+                    let btn = document.createElement('button'); btn.innerText = 'Editar';
+                    btn.addEventListener('click', () => mostrarFormulario(promo));
+                    celAcc.appendChild(btn);
                 });
 
                 lista.appendChild(tabla);
@@ -77,17 +79,10 @@ while ($r = $prodRes->fetch_assoc())
     function mostrarFormulario(promo = null) {
         let seleccionados = [];
 
-        if (promo && promo.productos) {
-            promo.productos.split(',').forEach(item => {
-                let [id, cant] = item.split(':');
-                let prod = productos.find(pr => pr.id_producto == id);
-                if (prod) seleccionados.push({ id: id, nombre: prod.nombre, cantidad: parseInt(cant) });
-            });
-        }
+        if (promo && promo.productos) seleccionados = promo.productos;
 
         const contenedor = document.getElementById('formulario');
         contenedor.innerHTML = '';
-
 
         const form = document.createElement('form');
         form.id = 'formPromo';
@@ -134,31 +129,24 @@ while ($r = $prodRes->fetch_assoc())
         imgPreview.style.objectFit = 'cover';
         imgPreview.style.marginTop = '6px';
         imgPreview.src = promo && promo.imagen ? promo.imagen : '../../images/perfil.png';
-
         form.appendChild(imgPreview);
 
         const divProd = document.createElement('div');
         const selectProd = document.createElement('select');
         const optDefault = document.createElement('option');
-        optDefault.value = '';
-        optDefault.innerText = 'Elegir producto';
-        selectProd.appendChild(optDefault);
+        optDefault.value = ''; optDefault.innerText = 'Elegir producto'; selectProd.appendChild(optDefault);
 
         productos.forEach(p => {
             const o = document.createElement('option');
-            o.value = p.id_producto;
-            o.innerText = p.nombre;
+            o.value = p.id_producto; o.innerText = p.nombre;
             selectProd.appendChild(o);
         });
 
         const inputCant = document.createElement('input');
-        inputCant.type = 'number';
-        inputCant.min = 1;
-        inputCant.value = 1;
+        inputCant.type = 'number'; inputCant.min = 1; inputCant.value = 1;
 
         const btnAgregarProd = document.createElement('button');
-        btnAgregarProd.type = 'button';
-        btnAgregarProd.innerText = 'Agregar';
+        btnAgregarProd.type = 'button'; btnAgregarProd.innerText = 'Agregar producto a la promoción';
 
         const divElegidos = document.createElement('div');
 
@@ -181,19 +169,14 @@ while ($r = $prodRes->fetch_assoc())
                 const fila = document.createElement('div');
                 fila.innerText = `${p.nombre} x ${p.cantidad} `;
                 const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.innerText = 'Quitar';
+                btn.type = 'button'; btn.innerText = 'Quitar';
                 btn.addEventListener('click', () => { seleccionados.splice(i, 1); actualizarLista(); });
                 fila.appendChild(btn);
                 divElegidos.appendChild(fila);
             });
         }
 
-        divProd.appendChild(selectProd);
-        divProd.appendChild(inputCant);
-        divProd.appendChild(btnAgregarProd);
-        divProd.appendChild(divElegidos);
-
+        divProd.appendChild(selectProd); divProd.appendChild(inputCant); divProd.appendChild(btnAgregarProd); divProd.appendChild(divElegidos);
         form.appendChild(divProd);
 
         const btnSubmit = document.createElement('button');
@@ -202,13 +185,12 @@ while ($r = $prodRes->fetch_assoc())
 
         if (promo) {
             const btnBorrar = document.createElement('button');
-            btnBorrar.type = 'button';
-            btnBorrar.innerText = 'Borrar';
+            btnBorrar.type = 'button'; btnBorrar.innerText = 'Borrar';
             btnBorrar.addEventListener('click', () => {
                 if (!confirm('Borrar?')) return;
                 const f = new FormData();
                 f.append('id_promocion', promo.id_promocion);
-                fetch('borrar.php', { method: 'POST', body: f }).then(() => location.reload());
+                fetch('borrar_promocion.php', { method: 'POST', body: f }).then(() => location.reload());
             });
             form.appendChild(btnBorrar);
         }
@@ -217,7 +199,7 @@ while ($r = $prodRes->fetch_assoc())
             e.preventDefault();
             const formData = new FormData(form);
             seleccionados.forEach(p => formData.append(`productos[${p.id}]`, p.cantidad));
-            fetch(promo ? 'act.php' : 'añadir.php', { method: 'POST', body: formData })
+            fetch(promo ? 'editar_promocion.php' : 'agregar_promocion.php', { method: 'POST', body: formData })
                 .then(() => location.reload());
         });
 
@@ -225,7 +207,7 @@ while ($r = $prodRes->fetch_assoc())
         actualizarLista();
     }
 
-    document.getElementById('nuevo').addEventListener('click', () => mostrarFormulario());
-    document.getElementById('mostrar').addEventListener('click', verLista);
+    document.getElementById('btnAgregar').addEventListener('click', () => mostrarFormulario());
+    document.getElementById('btnVer').addEventListener('click', verLista);
     verLista();
 </script>

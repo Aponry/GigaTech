@@ -1,0 +1,158 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f5f6fa;
+    padding: 20px;
+    color: #333;
+}
+
+/* Título */
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 25px;
+    color: #2c3e50;
+}
+
+/* Botones de arriba */
+button {
+    padding: 10px 15px;
+    margin: 0 5px 20px 0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#agregar {
+    background-color: #27ae60;
+    color: #fff;
+}
+
+#agregar:hover {
+    background-color: #1e8449;
+}
+
+#ver {
+    background-color: #3498db;
+    color: #fff;
+}
+
+#ver:hover {
+    background-color: #2980b9;
+}
+
+/* Contenedor de ingredientes */
+#lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+/* Tarjeta ingrediente */
+.ingrediente-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.ingrediente-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Nombre y costo */
+.ingrediente-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: #34495e;
+}
+
+.ingrediente-card p {
+    font-size: 0.95rem;
+    color: #7f8c8d;
+    margin-bottom: 10px;
+}
+
+/* Botones de acción dentro de tarjeta */
+.ingrediente-card button {
+    width: 45%;
+    padding: 8px;
+    margin: 3px 2%;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.ingrediente-card button.editar {
+    background-color: #f39c12;
+    color: #fff;
+}
+
+.ingrediente-card button.editar:hover {
+    background-color: #d35400;
+}
+
+.ingrediente-card button.borrar {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.ingrediente-card button.borrar:hover {
+    background-color: #c0392b;
+}
+
+/* Formulario agregar/editar */
+form {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+form input, form select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+form button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background-color: #27ae60;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #1e8449;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    #lista {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .ingrediente-card button {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
