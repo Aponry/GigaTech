@@ -1,128 +1,79 @@
 <?php
 require_once __DIR__ . '/../../conexion.php';
+$db = $conexion ?? null;
 
+// Pedimos las columnas de la tabla “productos” y buscamos la que se llama “tipo”
+$consultaColumnas = $db ? $db->query("SHOW COLUMNS FROM productos LIKE 'tipo'") : false;
+$filaColumna = $consultaColumnas ? $consultaColumnas->fetch_assoc() : null;
 
-$result = $conexion->query("SHOW COLUMNS FROM productos LIKE 'tipo'");
-$row = $result->fetch_assoc();
-preg_match_all("/'([^']+)'/", $row['Type'], $matches);
-$tipos = $matches[1];
+$tiposDisponibles = [];
+if (!empty($filaColumna['Type'])) {
+  // Extraemos los valores del ENUM usando una expresión regular, por ejemplo: enum('pizza','bebida') → ['pizza', 'bebida']
+  preg_match_all("/'([^']+)'/", $filaColumna['Type'], $coincidencias);
+  $tiposDisponibles = $coincidencias[1] ?? [];
+}
+
+// Si no encontramos tipos en la base, definimos “otro” por defecto
+if (empty($tiposDisponibles)) {
+  $tiposDisponibles = ['otro'];
+}
 ?>
-<link rel="stylesheet" href="style.css">
-<h1>Productos</h1>
+<!doctype html>
+<html lang="es">
 
-<button onclick="location.href='../menu.php'">Volver</button>
-<button id="btnAgregar">Agregar</button>
-<button id="btnVer">Ver</button>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <title>Productos</title>
+</head>
 
-<div id="formulario"></div>
-<div id="lista"></div>
+<body>
+  <h1>Productos</h1>
 
-<script>
-const tipos = <?php echo json_encode($tipos); ?>;
+  <div class="top-row">
+    <div class="left-controls">
+      <!-- Botones principales del panel -->
+      <button id="volver" type="button">Volver</button>
+      <button id="btnAgregar" type="button">Agregar producto</button>
+      <button id="btnVer" type="button">Ver</button>
+    </div>
 
-function mostrarLista() {
-    fetch('listar_productos.php')
-        .then(r => r.json())
-        .then(datos => {
-            const lista = document.getElementById('lista');
-            lista.innerHTML = '';
-            document.getElementById('formulario').innerHTML = '';
+    <div class="search-controls" role="search" aria-label="Buscar productos">
+      <!-- Campo de texto para buscar -->
+      <input id="searchInput" type="search" placeholder="Buscar por ID, nombre o producto..."
+        aria-label="Buscar por ID, nombre o producto">
 
-            if (!datos.length) { lista.innerText = 'No hay productos'; return; }
+      <!-- Filtro por tipo de producto (pizza, bebida, etc.) -->
+      <select id="filterTipo" aria-label="Filtrar por tipo">
+        <option value="">Todos los tipos</option>
+        <?php foreach ($tiposDisponibles as $tipo): ?>
+          <option value="<?= htmlspecialchars($tipo, ENT_QUOTES, 'UTF-8') ?>">
+            <?= htmlspecialchars(ucfirst($tipo), ENT_QUOTES, 'UTF-8') ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
 
-            let tabla = document.createElement('table');
-            let encabezado = tabla.insertRow();
-            ['ID', 'Imagen', 'Nombre', 'Tipo', 'Precio', 'Descripción', 'Acciones'].forEach(h => {
-                let th = document.createElement('th'); th.innerText = h; encabezado.appendChild(th);
-            });
+      <!-- Filtro para mostrar los que permiten o no ingredientes -->
+      <select id="filterPermit" aria-label="Filtrar por permite ingredientes">
+        <option value="">Todos</option>
+        <option value="1">Permiten ingredientes</option>
+        <option value="0">No permiten ingredientes</option>
+      </select>
 
-            datos.forEach(p => {
-                let fila = tabla.insertRow();
-                fila.insertCell().innerText = p.id_producto;
+      <!-- Botones de acción para búsqueda y limpieza -->
+      <button id="btnBuscar" class="btn-buscar" type="button">Buscar</button>
+      <button id="clearFilters" title="Limpiar filtros" type="button">Limpiar</button>
+    </div>
+  </div>
 
-                let celImagen = fila.insertCell();
-                let imgEl = document.createElement('img');
-                imgEl.src = p.imagen ? ('../' + p.imagen) : '../images/default.png';
-                imgEl.style.width = '60px';
-                imgEl.style.height = '60px';
-                imgEl.style.objectFit = 'cover';
-                celImagen.appendChild(imgEl);
+  <!-- Contenedores donde se cargan el formulario y la lista con JS -->
+  <div id="formulario" aria-live="polite"></div>
+  <div id="lista" aria-live="polite"></div>
 
-                [p.nombre, p.tipo, p.precio_base, p.descripcion].forEach(d => {
-                    fila.insertCell().innerText = d;
-                });
+  <!-- Pasamos los tipos disponibles al JS como JSON para usar en los menús -->
+  <script type="application/json" id="tipos-json"><?= json_encode($tiposDisponibles, JSON_UNESCAPED_UNICODE) ?></script>
+  <script src="productos.js" defer></script>
+</body>
 
-                let celAcc = fila.insertCell();
-                let btn = document.createElement('button'); 
-                btn.innerText = 'Editar';
-                btn.addEventListener('click', () => editarProducto(p));
-                celAcc.appendChild(btn);
-            });
-
-            lista.appendChild(tabla);
-        });
-}
-
-document.getElementById('btnAgregar').addEventListener('click', () => {
-    let sel = '<select name="tipo">';
-    tipos.forEach(t => sel += `<option value="${t}">${t}</option>`);
-    sel += '</select>';
-
-    document.getElementById('formulario').innerHTML = `<form id="formAgregar" enctype="multipart/form-data">
-        <input name="nombre" placeholder="Nombre" required>
-        ${sel}
-        <input name="precio" placeholder="Precio" required>
-        <input name="descripcion" placeholder="Descripción">
-        <input type="file" name="imagen" accept="image/*" required onchange="document.getElementById('previewAgregar').src = window.URL.createObjectURL(this.files[0])">
-        <img id="previewAgregar" style="width:60px;height:60px;object-fit:cover;margin-top:5px;">
-        <button>Agregar</button>
-    </form>`;
-
-    document.getElementById('lista').innerHTML = '';
-
-    document.getElementById('formAgregar').addEventListener('submit', e => {
-        e.preventDefault();
-        fetch('agregar_producto.php', { method: 'POST', body: new FormData(e.target) })
-            .then(() => location.reload());
-    });
-});
-
-function editarProducto(p) {
-    let sel = '<select name="tipo">';
-    tipos.forEach(t => sel += `<option value="${t}" ${t === p.tipo ? 'selected' : ''}>${t}</option>`);
-    sel += '</select>';
-
-    document.getElementById('formulario').innerHTML = `<form id="formEditar" enctype="multipart/form-data">
-        <input type="hidden" name="id_producto" value="${p.id_producto}">
-        <input name="nombre" value="${p.nombre}" placeholder="Nombre" required>
-        ${sel}
-        <input name="precio" value="${p.precio_base}" placeholder="Precio" required>
-        <input name="descripcion" value="${p.descripcion}" placeholder="Descripción">
-        <div>Imagen actual: <img id="previewEditar" src="${p.imagen ? ('../' + p.imagen) : '../images/default.png'}" style="width:60px;height:60px;object-fit:cover;"></div>
-        <input type="file" name="imagen" accept="image/*" onchange="document.getElementById('previewEditar').src = window.URL.createObjectURL(this.files[0])">
-        <button>Guardar</button>
-        <button type="button" id="btnBorrar">Borrar</button>
-    </form>`;
-
-    document.getElementById('formEditar').addEventListener('submit', e => {
-        e.preventDefault();
-        fetch('editar_producto.php', { method: 'POST', body: new FormData(e.target) })
-            .then(() => location.reload());
-    });
-
-    document.getElementById('btnBorrar').addEventListener('click', () => {
-        if (!confirm('Borrar producto?')) return;
-        let f = new FormData();
-        f.append('id_producto', p.id_producto);
-        fetch('borrar_producto.php', { method: 'POST', body: f })
-            .then(r => r.json())
-            .then(res => {
-                if (!res.ok) alert(res.error);
-                else location.reload();
-            });
-    });
-}
-
-document.getElementById('btnVer').addEventListener('click', mostrarLista);
-mostrarLista();
-</script>
+</html>

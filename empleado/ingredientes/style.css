@@ -1,158 +1,167 @@
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
-}
-
+/* reset / base */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
 body {
-    background-color: #f5f6fa;
-    padding: 20px;
-    color: #333;
+  font-family: Arial, sans-serif;
+  background: #f5f6fa;
+  color: #333;
+  padding: 20px;
 }
 
-/* Título */
-h1 {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 25px;
-    color: #2c3e50;
+/* fila superior: título + botones */
+.fila-superior { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+.fila-superior h1 { font-size:1.6rem; color:#2c3e50; margin:0; }
+
+/* controles a la izquierda (volver/agregar/ver) */
+.controles-izquierda { display:flex; gap:8px; align-items:center; }
+
+/* fila para buscador/ filtros */
+.buscador-fila { margin-bottom:12px; }
+.controles-busqueda { display:flex; gap:8px; align-items:center; }
+
+/* inputs del buscador y select de filtro */
+#buscarInput,
+#filtroTipo {
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid #dcdcdc;
+  background:#fff;
+  font-size:0.95rem;
+}
+#buscarInput { min-width:220px; }
+
+/* boton limpiar filtros */
+#limpiarFiltros {
+  padding:8px 10px;
+  border-radius:8px;
+  background:#f0f0f0;
+  border:1px solid rgba(0,0,0,0.06);
+  cursor:pointer;
 }
 
-/* Botones de arriba */
+/* botones generales */
 button {
-    padding: 10px 15px;
-    margin: 0 5px 20px 0;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
+  padding:8px 12px;
+  border:0;
+  border-radius:8px;
+  cursor:pointer;
+  transition: background .12s, transform .12s;
+  font-weight:600;
+  background:#fff;
+  color:#222;
+}
+button:active { transform: translateY(1px); }
+button:focus { outline:3px solid rgba(47,137,201,.12); outline-offset:2px; }
+
+/* botones principales específicos */
+#agregar { background:#27ae60; color:#fff; }
+#agregar:hover { background:#1e8449; }
+#ver { background:#3498db; color:#fff; }
+#ver:hover { background:#2980b9; }
+#volver { background:transparent; color:#444; border:1px solid transparent; }
+
+/* contenedores */
+#formulario { margin-bottom:14px; }
+#lista { margin-top:8px; }
+
+/* tabla compacta de ingredientes */
+.ingredientes-table {
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.03);
+}
+.ingredientes-table thead th {
+  text-align:left;
+  padding:10px;
+  background:#fafafa;
+  border-bottom:1px solid rgba(0,0,0,0.06);
+  font-weight:600;
+  color:#34495e;
+  font-size:.95rem;
+}
+.ingredientes-table td {
+  padding:10px;
+  border-bottom:1px solid rgba(0,0,0,0.06);
+  vertical-align:middle;
+  font-size:.95rem;
+  color:#333;
 }
 
-#agregar {
-    background-color: #27ae60;
-    color: #fff;
-}
+/* control de anchos por columna para que Nombre no se coma todo */
+.ingredientes-table th:nth-child(1), .ingredientes-table td:nth-child(1) { width:70px; min-width:60px; text-align:left; }
+.ingredientes-table th:nth-child(2), .ingredientes-table td:nth-child(2) { width:45%; min-width:140px; }
+.ingredientes-table th:nth-child(3), .ingredientes-table td:nth-child(3) { width:20%; min-width:100px; }
+.ingredientes-table th:nth-child(4), .ingredientes-table td:nth-child(4) { width:15%; min-width:80px; }
+.ingredientes-table th:nth-child(5), .ingredientes-table td:nth-child(5) { width:120px; min-width:110px; text-align:center; }
 
-#agregar:hover {
-    background-color: #1e8449;
+/* botones en cada fila */
+.btn-editar {
+  background:#f39c12;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:6px;
+  border:0;
+  margin-right:6px;
 }
+.btn-editar:hover { background:#d37400; }
 
-#ver {
-    background-color: #3498db;
-    color: #fff;
+.btn-borrar,
+.btn-delete {
+  background:#e74c3c;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:6px;
+  border:0;
 }
+.btn-borrar:hover,
+.btn-delete:hover { background:#c0392b; }
 
-#ver:hover {
-    background-color: #2980b9;
-}
-
-/* Contenedor de ingredientes */
-#lista {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 20px;
-}
-
-/* Tarjeta ingrediente */
-.ingrediente-card {
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 15px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.ingrediente-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-/* Nombre y costo */
-.ingrediente-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-    color: #34495e;
-}
-
-.ingrediente-card p {
-    font-size: 0.95rem;
-    color: #7f8c8d;
-    margin-bottom: 10px;
-}
-
-/* Botones de acción dentro de tarjeta */
-.ingrediente-card button {
-    width: 45%;
-    padding: 8px;
-    margin: 3px 2%;
-    border-radius: 8px;
-    border: none;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.ingrediente-card button.editar {
-    background-color: #f39c12;
-    color: #fff;
-}
-
-.ingrediente-card button.editar:hover {
-    background-color: #d35400;
-}
-
-.ingrediente-card button.borrar {
-    background-color: #e74c3c;
-    color: #fff;
-}
-
-.ingrediente-card button.borrar:hover {
-    background-color: #c0392b;
-}
-
-/* Formulario agregar/editar */
+/* formulario */
 form {
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+  background:#fff;
+  padding:12px;
+  border-radius:10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
 }
-
 form input, form select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+  width:100%;
+  padding:8px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #dcdcdc;
+  font-size:.95rem;
+  background:#fff;
+}
+form input::placeholder { color:#999; }
+
+/* acciones del form */
+.form-actions { display:flex; gap:8px; justify-content:flex-end; align-items:center; margin-top:6px; }
+.btn-cancel { background:#ccc; color:#222; padding:8px 12px; border-radius:8px; border:0; }
+.btn-save { background:#2fa34a; color:#fff; padding:8px 12px; border-radius:8px; border:0; }
+
+/* inputs deshabilitados */
+input[disabled], select[disabled] { background:#f2f2f2; color:#777; cursor:not-allowed; }
+
+/* utilidades para forzar visibilidad si otra hoja es muy agresiva */
+.controles-izquierda button,
+.btn-editar,
+.btn-borrar,
+.btn-delete {
+  display:inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
-form button {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    background-color: #27ae60;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-form button:hover {
-    background-color: #1e8449;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-    #lista {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    }
-
-    .ingrediente-card button {
-        width: 100%;
-        margin: 5px 0;
-    }
+/* responsive */
+@media (max-width:720px) {
+  .fila-superior { flex-direction:column; align-items:flex-start; gap:10px; }
+  .controles-busqueda { justify-content:space-between; gap:6px; width:100%; }
+  #buscarInput { flex:1 1 auto; min-width:120px; }
+  .ingredientes-table thead th, .ingredientes-table td { padding:8px; font-size:.9rem; }
+  .form-actions { flex-direction:column-reverse; align-items:stretch; }
+  .form-actions button { width:100%; }
 }

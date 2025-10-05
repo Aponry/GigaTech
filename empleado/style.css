@@ -1,80 +1,112 @@
-/* Reset básico */
+/* reseteamos márgenes y paddings para que todo arranque parejo */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Roboto, sans-serif;
 }
 
+/* fondo claro y limpio, centramos todo para que quede prolijo */
 body {
-    background-color: #f5f6fa;
-    padding: 30px;
-    color: #2c3e50;
+  background: #f4f6f8;
+  color: #2d3a4a;
+  min-height: 100vh;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Título */
+/* título principal centrado, un poco más grande y con buen contraste */
 h1 {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 40px;
+  font-size: 2.2rem;
+  color: #1f3d68;
+  margin-bottom: 35px;
+  text-align: center;
+  font-weight: 600;
 }
 
-/* Menú principal */
+/* contenedor del menú, blanco con bordes suaves y una sombrita leve */
+nav {
+  background: #fff;
+  border: 1px solid #d2d8e0;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  padding: 25px 35px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* cuando el usuario pasa el mouse, que suba apenas para dar feedback */
+nav:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* lista de botones dentro del menú, en fila y con un poco de aire entre ellos */
 nav ul {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 20px;
-    list-style: none;
-    justify-items: center;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
 }
 
-nav ul li {
-    width: 100%;
+/* estilo base de los botones, azul medio y con algo de relieve */
+nav a {
+  text-decoration: none;
+  color: #fff;
+  background: #2f5f9c;
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: inline-block;
 }
 
-nav ul li a {
-    display: block;
-    text-decoration: none;
-    background-color: #3498db;
-    color: #fff;
-    padding: 40px 0;
-    border-radius: 12px;
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+/* al pasar el mouse, se oscurece un toque y sube un píxel para dar efecto */
+nav a:hover {
+  background: #264d80;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
 }
 
-/* Hover animaciones */
-nav ul li a:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    background-color: #2980b9;
-}
-
-/* Separador */
+/* línea separadora entre secciones, simple y discreta */
 hr {
-    margin: 40px 0;
-    border: 0;
-    height: 1px;
-    background: #ccc;
+  width: 85%;
+  margin: 35px auto;
+  border: none;
+  border-top: 1px solid #c8d0db;
+  opacity: 0.7;
 }
 
-/* Texto debajo del menú */
+/* párrafos centrados, color gris azulado para que no canse */
 p {
+  font-size: 1.1rem;
+  color: #495d73;
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* ajustes para pantallas chicas, todo más compacto y apilado */
+@media (max-width: 700px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    padding: 20px;
+  }
+
+  nav ul {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  nav a {
     text-align: center;
     font-size: 1rem;
-    color: #7f8c8d;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-    nav ul {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    }
-
-    nav ul li a {
-        padding: 30px 0;
-        font-size: 1rem;
-    }
+    padding: 12px 0;
+  }
 }

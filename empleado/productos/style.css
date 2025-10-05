@@ -1,185 +1,225 @@
-/* Reset */
+/* Reset y base */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
 }
 
 body {
-    background-color: #f5f6fa;
-    padding: 20px;
-    color: #333;
+  background: #f5f6fa;
+  color: #333;
+  padding: 20px;
 }
 
-/* Título */
-h1 {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 25px;
-    color: #2c3e50;
+h1,
+h2 {
+  color: #2c3e50;
+  margin-bottom: 16px;
 }
 
-/* Botones de arriba */
+/* Controles superiores */
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.left-controls,
+.search-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+input,
+select,
+button,
+textarea {
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+#searchInput,
+#filterTipo,
+#filterPermit {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+/* Botones */
 button {
-    padding: 10px 15px;
-    margin: 0 5px 20px 0;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
-#btnAgregar {
-    background-color: #27ae60;
-    color: #fff;
+button:hover {
+  transform: translateY(-1px);
 }
 
-#btnAgregar:hover {
-    background-color: #1e8449;
+#volver {
+  background-color: #f0f0f0;
+  color: #2c3e50;
 }
 
-#btnVer {
-    background-color: #3498db;
-    color: #fff;
+#btnAgregar,
+.form-actions button[type="submit"] {
+  background-color: #27ae60;
+  color: #fff;
 }
 
-#btnVer:hover {
-    background-color: #2980b9;
+#btnVer,
+#btnBuscar {
+  background-color: #3498db;
+  color: #fff;
 }
 
-/* Contenedor de productos */
-#lista {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 20px;
+#clearFilters,
+.form-actions button[type="button"] {
+  background-color: #e74c3c;
+  color: #fff;
 }
 
-/* Tarjeta producto */
-.producto-card {
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 15px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
+.btn-editar {
+  background-color: #e67e22;
+  color: #fff;
 }
 
-.producto-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+.btn-borrar {
+  background-color: #e74c3e;
+  color: #fff;
 }
 
-/* Imagen */
-.producto-card img {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    transition: transform 0.3s;
+/* Tabla de productos */
+.productos-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.producto-card img:hover {
-    transform: scale(1.05);
+.productos-table th,
+.productos-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: middle;
 }
 
-/* Nombre y precio */
-.producto-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-    color: #34495e;
+.productos-table th {
+  background: #fafafa;
+  font-weight: 600;
+  color: #34495e;
 }
 
-.producto-card p {
-    font-size: 0.95rem;
-    color: #7f8c8d;
-    margin-bottom: 10px;
+.img-preview-tabla {
+  border-radius: 6px;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
 }
 
-/* Botones de acción dentro de tarjeta */
-.producto-card button {
-    width: 45%;
-    padding: 8px;
-    margin: 3px 2%;
-    border-radius: 8px;
-    border: none;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.producto-card button:first-child {
-    background-color: #f39c12;
-    color: #fff;
-}
-
-.producto-card button:first-child:hover {
-    background-color: #d35400;
-}
-
-.producto-card button:last-child {
-    background-color: #e74c3c;
-    color: #fff;
-}
-
-.producto-card button:last-child:hover {
-    background-color: #c0392b;
-}
-
-/* Formulario agregar/editar */
+/* Formulario */
 form {
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
 }
 
-form input, form select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%;
 }
 
-form button {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    background-color: #27ae60;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-form button:hover {
-    background-color: #1e8449;
+.form-group label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
 }
 
-/* Preview imagen */
-#previewAgregar, #previewEditar {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 10px;
+.form-input,
+.form-select,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-    #lista {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    }
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
 
-    .producto-card img, #previewAgregar, #previewEditar {
-        height: 100px;
-    }
+.form-hint {
+  font-size: 0.85rem;
+  color: #666;
+}
 
-    .producto-card button {
-        width: 100%;
-        margin: 5px 0;
-    }
+.emp-ingred-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.img-preview-form {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 5px;
+}
+
+/* File input custom */
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-label {
+  display: inline-block;
+  background-color: #3498db;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  max-width: 200px;
+}
+
+.file-name {
+  font-size: 0.9rem;
+  color: #555;
+  word-break: break-all;
+  min-height: 1.2em;
+}
+
+/* Acciones del formulario */
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 20px;
 }

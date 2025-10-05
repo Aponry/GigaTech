@@ -21,6 +21,7 @@
         <li><a href="pedidos/pedidos.php">Pedidos</a></li>
         <li><a href="recibos/recibos.php">Recibos</a></li>
         <li><a href="estadisticas/estadisticas.php">Estadísticas</a></li>
+        <li><a href="stock/stock.php">Stock</a></li>
     </ul>
 </nav>
 
