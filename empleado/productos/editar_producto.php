@@ -48,12 +48,12 @@ $ruta_imagen_final = $producto_actual['imagen'] ?? null;
 // Si suben una nueva imagen...
 if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
     // Eliminamos la imagen vieja si existe
-    if (!empty($ruta_imagen_final) && file_exists(__DIR__ . '/../../' . $ruta_imagen_final)) {
-        unlink(__DIR__ . '/../../' . $ruta_imagen_final);
+    if (!empty($ruta_imagen_final) && file_exists(__DIR__ . '../img/' . $ruta_imagen_final)) {
+        unlink(__DIR__ . '../img/' . $ruta_imagen_final);
     }
 
     // Definimos el directorio para las imágenes subidas
-    $directorio_uploads = __DIR__ . '/../../uploads/productos/';
+    $directorio_uploads = __DIR__ . '/../img/';
     if (!is_dir($directorio_uploads)) {
         mkdir($directorio_uploads, 0777, true); // Si no existe, lo creamos
     }
@@ -64,7 +64,7 @@ if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
 
     // Movemos la imagen al directorio de uploads
     if (move_uploaded_file($_FILES['imagen']['tmp_name'], $ruta_completa)) {
-        $ruta_imagen_final = 'uploads/productos/' . $nombre_archivo; // Guardamos la ruta final de la imagen
+        $ruta_imagen_final = '../img/' . $nombre_archivo; // Guardamos la ruta final de la imagen
     }
 }
 
