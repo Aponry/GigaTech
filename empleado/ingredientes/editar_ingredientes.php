@@ -1,6 +1,10 @@
 <?php
-// Chequeamos la conexión a la base de datos
+// Incluir la conexión a la base de datos (ruta relativa)
+// desde empleado/ingredientes -> ../../conexion.php
+require_once __DIR__ . '/../../conexion.php';
 $db = $conexion ?? null;
+// Siempre devolver JSON
+header('Content-Type: application/json; charset=utf-8');
 if (!$db) {
     http_response_code(500);
     echo json_encode(['ok' => false, 'error' => 'sin conexión'], JSON_UNESCAPED_UNICODE);
