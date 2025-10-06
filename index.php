@@ -125,3 +125,5 @@ if ($prod_res) {
 #d
 #a
 #hol
+
+#Seria necesario agregar todo el feature para que se vea bien la pagina, se muestren productos, puedan agregarse y finalmente se agregue el carrito tambien
