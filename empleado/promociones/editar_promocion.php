@@ -52,11 +52,11 @@ if ($nombre === '') {
 }
 
 // Si se sube imagen nueva, la guarda y actualiza ruta
-$imagen_db = '../img/';
+$imagen_db = '../empleado/promociones/img/';
 if (!empty($_FILES['imagen']['name']) && isset($_FILES['imagen']) && $_FILES['imagen']['error'] === 0) {
     $ext = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
     $archivo = 'promo_' . time() . '.' . $ext;
-    $dest = __DIR__ . '../img../' . $archivo;
+    $dest = __DIR__ . '/img/' . $archivo;
 
     // Verificar si la imagen se mueve correctamente
     if (!(is_uploaded_file($_FILES['imagen']['tmp_name']) && move_uploaded_file($_FILES['imagen']['tmp_name'], $dest))) {
@@ -66,7 +66,7 @@ if (!empty($_FILES['imagen']['name']) && isset($_FILES['imagen']) && $_FILES['im
     }
 
     // Actualiza con imagen nueva
-    $imagen_db = '../img/' . $archivo;
+    $imagen_db = '../empleado/promociones/img/' . $archivo;
     $stmt = $conexion->prepare("UPDATE promocion SET nombre = ?, precio = ?, descripcion = ?, imagen = ? WHERE id_promocion = ?");
     if (!$stmt) {
         http_response_code(500);

@@ -24,19 +24,22 @@ if ($nombre === '') {
 $precio = (float) str_replace(',', '.', $precio_raw);
 
 // Si se sube una imagen, se guarda en /images y se registra su ruta
-$imagen_db = '../img/';
+$imagen_db = '../empleado/promociones/img/';
 if (!empty($_FILES['imagen']['name']) && isset($_FILES['imagen']) && $_FILES['imagen']['error'] === 0) {
     $ext = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
     $archivo = 'promo_' . time() . '.' . $ext;
-    $dest = __DIR__ . '../img/' . $archivo;
+    $dest = __DIR__ . '/img/' . $archivo;
 
     if (is_uploaded_file($_FILES['imagen']['tmp_name']) && move_uploaded_file($_FILES['imagen']['tmp_name'], $dest)) {
-        $imagen_db = '../img/' . $archivo;
+        $imagen_db = '../empleado/promociones/img/' . $archivo;
     } else {
         http_response_code(500);
         echo json_encode(['ok' => false, 'error' => 'no se pudo guardar la imagen']);
         exit;
     }
+} else {
+    // Si no se sube imagen, dejar vacío o usar una por defecto
+    $imagen_db = '';
 }
 
 // Inserta la promoción principal

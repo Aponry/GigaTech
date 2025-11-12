@@ -1,79 +1,102 @@
 // PRODUCTOS_PROMO: lista de productos para usar en los combos/promos, viene del HTML
 const PRODUCTOS_PROMO = JSON.parse(document.getElementById('productos-json')?.textContent || '[]');
 
-// _esc: escapa valores nulos o indefinidos, para no mostrar "undefined"
-function _esc(v) { return String(v ?? ''); }
+// escaparHtml: escapa caracteres especiales para evitar que se rompa el HTML
+function escaparHtml(s) {
+  return String(s ?? '').replace(/[&<>"'`=\/]/g, c => ({
+    '&': '&',
+    '<': '<',
+    '>': '>',
+    '"': '"',
+    "'": '&#39;',
+    '/': '&#x2F;',
+    '`': '&#60;',
+    '=': '&#x3D;',
+  })[c]);
+}
 
-// obtenerJson: hace fetch y devuelve JSON, maneja errores tipo red o HTTP
-// ojo que si falla devuelve null y loguea por consola
-async function obtenerJson(url, opts = {}) {
+// escaparImagen: corrige la ruta de las imágenes de promociones
+function escaparImagen(img) {
+  if (!img) return '';
+  
+  // Si la imagen ya tiene la ruta correcta, la devolvemos tal cual
+  if (img.startsWith('img/')) {
+    return img;
+  }
+  
+  // Si es solo el nombre del archivo, le agregamos la ruta correcta
+  if (img.startsWith('promo_')) {
+    return 'img/' + img;
+  }
+  
+  // Para cualquier otro caso, devolvemos la imagen tal cual
+  return img;
+}
+
+// fetchJson: hace fetch a la URL pasada y devuelve JSON
+async function fetchJson(url, opts = {}) {
   try {
-    const res = await fetch(url, { cache: 'no-cache', ...opts });
-    if (!res.ok) {
-      const txt = await res.text().catch(() => null);
-      throw new Error(`HTTP ${res.status} ${res.statusText}${txt ? ' — ' + txt : ''}`);
+    const r = await fetch(url, { cache: 'no-cache', ...opts });
+    if (!r.ok) {
+      const errData = await r.json().catch(() => null);
+      throw { status: r.status, data: errData };
     }
-    return await res.json();
+    return await r.json();
   } catch (e) {
-    console.error('Error fetch:', url, e);
+    const errorMsg = e.data?.error || `Error de conexión (${e.status || 'Cliente'})`;
+    alert(errorMsg); // simple alert for now
     return null;
   }
 }
 
-// debounce: limita la frecuencia de ejecución de una función (para búsquedas, inputs)
-// cuidado: si cambian la demora, puede sentirse más lento o más agresivo
-function debounce(fn, ms = 200) {
-  let t = null;
-  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+// mostrarMensaje: marcador de posición para mensajes
+function mostrarMensaje(msg, type) {
+  alert(msg);
 }
 
-// --- Inicialización de eventos al cargar la página ---
-document.addEventListener('DOMContentLoaded', () => {
-  const btnVer = document.getElementById('ver');
-  const btnAgregar = document.getElementById('agregar');
-  const btnVolver = document.getElementById('volver');
-  const inputBuscar = document.getElementById('buscarInput');
-  const btnLimpiar = document.getElementById('limpiarFiltros');
+// Función para filtrar promociones
+function filtrarPromociones() {
+  const searchInput = document.getElementById('searchInput');
+  const query = searchInput ? searchInput.value.toLowerCase() : '';
+  const items = document.querySelectorAll('#promociones-section tbody tr[data-name]');
 
-  // botones principales
-  if (btnVer) btnVer.addEventListener('click', mostrarListadoPromos);
-  if (btnAgregar) btnAgregar.addEventListener('click', () => mostrarFormularioPromo());
-  if (btnVolver) btnVolver.addEventListener('click', () => location.href = '../menu.php');
-
-  // input búsqueda con debounce
-  if (inputBuscar) inputBuscar.addEventListener('input', debounce(mostrarListadoPromos, 220));
-
-  // limpiar filtros y recargar listado
-  if (btnLimpiar) btnLimpiar.addEventListener('click', () => {
-    if (inputBuscar) inputBuscar.value = '';
-    mostrarListadoPromos();
+  items.forEach(item => {
+    // Obtener datos de la fila usando los atributos de datos
+    const name = item.getAttribute('data-name') || '';
+    const productos = item.getAttribute('data-productos') || '';
+    const activo = item.getAttribute('data-activo') || '';
+    
+    // Verificar coincidencias
+    const matchesName = name.includes(query);
+    const matchesProductos = productos.includes(query);
+    const matchesActivo = query === 'activo' || query === 'si' ? activo.includes('si') : 
+                         query === 'inactivo' || query === 'no' ? activo.includes('no') : 
+                         false;
+    
+    // Mostrar u ocultar fila según coincidencias
+    const shouldShow = !query || matchesName || matchesProductos || matchesActivo;
+    item.style.display = shouldShow ? 'table-row' : 'none';
   });
+}
 
-  mostrarListadoPromos(); // al cargar, mostramos la lista
-});
+// Función para limpiar filtros
+function limpiarFiltros() {
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.value = '';
+  filtrarPromociones();
+}
 
-// mostrarListadoPromos: pinta la tabla con todas las promociones
-async function mostrarListadoPromos() {
-  const datos = await obtenerJson('listar_promociones.php');
-  const cont = document.getElementById('lista');
-  const contForm = document.getElementById('formulario');
-  if (!cont) return console.error('#lista no existe');
-  cont.innerHTML = '';
-  if (contForm) contForm.innerHTML = ''; // limpiamos formulario si estaba
+// renderizarTabla: arma la tabla de promociones
+function renderizarTabla(datos) {
+  const cont = document.getElementById('promociones-section');
+  if (!cont) return;
 
   if (!Array.isArray(datos) || !datos.length) {
-    cont.textContent = 'No hay promociones';
+    cont.innerHTML = '<p>No hay promociones</p>';
     return;
   }
 
-  // filtrado por búsqueda
-  const q = (document.getElementById('buscarInput')?.value || '').toLowerCase().trim();
-
-  // armamos tabla
   const tabla = document.createElement('table');
-  tabla.className = 'tabla-promos';
-
-  // encabezados
   const thead = tabla.createTHead();
   const filaH = thead.insertRow();
   ['ID', 'Imagen', 'Nombre', 'Precio', 'Descripción', 'Productos', 'Activo', 'Acciones'].forEach(h => {
@@ -84,21 +107,25 @@ async function mostrarListadoPromos() {
 
   const tbody = tabla.createTBody();
 
-  // filas con datos
   datos.forEach(p => {
-    if (q && !(String(p.id_promocion).includes(q) || String(p.nombre).toLowerCase().includes(q))) return;
-
     const tr = tbody.insertRow();
+    tr.setAttribute('data-name', (p.nombre || '').toLowerCase());
+    tr.setAttribute('data-activo', p.activo == 1 ? 'si' : 'no');
+    
+    // Agregar productos como atributo de datos para búsqueda
+    if (p.productos && p.productos.length) {
+      const productosNombres = p.productos.map(prod => prod.nombre.toLowerCase()).join(',');
+      tr.setAttribute('data-productos', productosNombres);
+    }
+
     tr.insertCell().textContent = p.id_promocion;
 
-    // imagen de la promo
     const tdImg = tr.insertCell();
-    tdImg.className = 'col-img';
     if (p.imagen) {
       const img = document.createElement('img');
-      img.src = p.imagen;
+      img.src = escaparImagen(p.imagen);
       img.alt = p.nombre ? `Imagen de ${p.nombre}` : 'Imagen promo';
-      img.className = 'img-preview-form';
+      img.className = 'img-preview-table';
       tdImg.appendChild(img);
     }
 
@@ -106,62 +133,73 @@ async function mostrarListadoPromos() {
     tr.insertCell().textContent = p.precio ?? '';
     tr.insertCell().textContent = p.descripcion ?? '';
 
-    // productos incluidos en la promo
     const tdProds = tr.insertCell();
     tdProds.textContent = p.productos?.length
       ? p.productos.map(x => `${x.nombre} x ${x.cantidad}`).join(', ')
-      : '';
+      : 'Sin productos';
+    tdProds.title = tdProds.textContent;
 
-    // checkbox para activar/desactivar promo
-    const tdActivo = tr.insertCell();
-    tdActivo.style.textAlign = 'center';
-    const chk = document.createElement('input');
-    chk.type = 'checkbox';
-    chk.checked = Number(p.activo) === 1;
-    chk.addEventListener('change', async () => {
-      const body = new URLSearchParams();
-      body.append('id_promocion', p.id_promocion);
-      body.append('activo', chk.checked ? 1 : 0);
-      await fetch('editar_promocion.php', { method: 'POST', body });
-    });
-    tdActivo.appendChild(chk);
+    tr.insertCell().textContent = p.activo == 1 ? 'Sí' : 'No';
 
-    // botones de acción
     const tdAcc = tr.insertCell();
-    tdAcc.style.textAlign = 'center';
-
-    const btnEditar = document.createElement('button');
-    btnEditar.type = 'button';
-    btnEditar.className = 'btn-editar';
-    btnEditar.textContent = 'Editar';
-    btnEditar.addEventListener('click', () => mostrarFormularioPromo(p));
-    tdAcc.appendChild(btnEditar);
-
-    const btnBorrar = document.createElement('button');
-    btnBorrar.type = 'button';
-    btnBorrar.className = 'btn-borrar';
-    btnBorrar.textContent = 'Borrar';
-    btnBorrar.addEventListener('click', async () => {
-      if (!confirm('¿Borrar promoción?')) return;
-      btnBorrar.disabled = true;
-      const fd = new FormData();
-      fd.append('id_promocion', p.id_promocion);
-      const res = await obtenerJson('borrar_promocion.php', { method: 'POST', body: fd });
-      btnBorrar.disabled = false;
-      if (res?.ok) mostrarListadoPromos();
-      else alert(res?.error || 'Error al borrar');
-    });
-    tdAcc.appendChild(btnBorrar);
+    // Crear un contenedor para los botones con mejor separación visual
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.style.display = 'flex';
+    buttonsContainer.style.gap = '5px';
+    buttonsContainer.style.flexWrap = 'wrap';
+    
+    // Botones de edición y borrado
+    const editButton = document.createElement('button');
+    editButton.className = 'btn-editar';
+    editButton.textContent = 'Editar';
+    editButton.setAttribute('data-id', p.id_promocion);
+    
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'btn-borrar';
+    deleteButton.textContent = 'Borrar';
+    deleteButton.setAttribute('data-id', p.id_promocion);
+    
+    // Botón de activación/desactivación
+    const toggleButton = document.createElement('button');
+    toggleButton.className = p.activo == 1 ? 'btn-desactivar' : 'btn-activar';
+    toggleButton.textContent = p.activo == 1 ? 'Desactivar' : 'Activar';
+    toggleButton.setAttribute('data-id', p.id_promocion);
+    
+    // Añadir botones al contenedor
+    buttonsContainer.appendChild(editButton);
+    buttonsContainer.appendChild(deleteButton);
+    buttonsContainer.appendChild(toggleButton);
+    
+    // Añadir contenedor a la celda
+    tdAcc.appendChild(buttonsContainer);
   });
 
+  cont.innerHTML = '';
   cont.appendChild(tabla);
+
+  // Agregar event listeners a botones
+  cont.querySelectorAll('.btn-editar').forEach(btn => {
+    btn.addEventListener('click', () => mostrarFormulario('editar', parseInt(btn.dataset.id)));
+  });
+
+  cont.querySelectorAll('.btn-borrar').forEach(btn => {
+    btn.addEventListener('click', () => borrarPromocion(parseInt(btn.dataset.id)));
+  });
 }
 
-// crearSelectProdDom: arma el select de productos para agregar a la promo
+// cambiarActivo: cambia el estado activo de la promo
+async function cambiarActivo(id, activo) {
+  const body = new FormData();
+  body.append('id_promocion', id);
+  body.append('activo', activo ? 1 : 0);
+  await fetchJson('editar_promocion.php', { method: 'POST', body });
+}
+
+// crearSelectProdDom: arma el select de productos
 function crearSelectProdDom(idSeleccionado = '') {
   const sel = document.createElement('select');
   sel.name = 'producto';
-  sel.className = 'form-select';
+  sel.className = 'form-input';
   const placeholder = document.createElement('option');
   placeholder.value = '';
   placeholder.textContent = 'Seleccionar producto';
@@ -179,16 +217,14 @@ function crearSelectProdDom(idSeleccionado = '') {
 // mostrarFormularioPromo: muestra formulario de alta/edición de promo
 function mostrarFormularioPromo(promo = null) {
   const cont = document.getElementById('formulario');
-  if (!cont) return console.error('#formulario no existe');
+  if (!cont) return;
   cont.innerHTML = '';
 
-  // productos seleccionados inicialmente
   let seleccionados = [];
   if (promo?.productos) {
     seleccionados = promo.productos.map(x => ({ id: String(x.id_producto), nombre: x.nombre, cantidad: Number(x.cantidad) }));
   }
 
-  // armado del form
   const form = document.createElement('form');
   form.id = 'formPromo';
   form.enctype = 'multipart/form-data';
@@ -202,17 +238,20 @@ function mostrarFormularioPromo(promo = null) {
     form.appendChild(hid);
   }
 
-  // columna de datos principales
   const colCampos = document.createElement('div');
-  colCampos.className = 'col-datos';
+  colCampos.className = 'form-group';
 
+  // Sección de información básica de la promoción
+  const basicInfoSection = document.createElement('div');
+  basicInfoSection.className = 'form-section';
+  
   const inpNombre = document.createElement('input');
   inpNombre.name = 'nombre';
   inpNombre.placeholder = 'Nombre';
   inpNombre.required = true;
   inpNombre.value = promo?.nombre ?? '';
   inpNombre.className = 'form-input';
-  colCampos.appendChild(inpNombre);
+  basicInfoSection.appendChild(inpNombre);
 
   const inpPrecio = document.createElement('input');
   inpPrecio.name = 'precio';
@@ -223,121 +262,144 @@ function mostrarFormularioPromo(promo = null) {
   inpPrecio.step = '0.01';
   inpPrecio.value = promo?.precio ?? '';
   inpPrecio.className = 'form-input';
-  colCampos.appendChild(inpPrecio);
+  basicInfoSection.appendChild(inpPrecio);
 
-  const inpDesc = document.createElement('input');
+  const inpDesc = document.createElement('textarea');
   inpDesc.name = 'descripcion';
   inpDesc.placeholder = 'Descripción';
   inpDesc.value = promo?.descripcion ?? '';
   inpDesc.className = 'form-input';
-  colCampos.appendChild(inpDesc);
+  basicInfoSection.appendChild(inpDesc);
+  
+  colCampos.appendChild(basicInfoSection);
 
-  // controles para agregar productos
+  // Sección de selección de productos
+  const productSection = document.createElement('div');
+  productSection.className = 'form-section';
+  
+  const productHeader = document.createElement('h3');
+  productHeader.textContent = 'Seleccionar productos';
+  productSection.appendChild(productHeader);
+
   const contProdWrap = document.createElement('div');
-  contProdWrap.className = 'agregar-prod-cont';
+  contProdWrap.className = 'product-selection-controls';
+  
   const selProd = crearSelectProdDom('');
   selProd.id = 'selProd';
   contProdWrap.appendChild(selProd);
+  
   const inputCant = document.createElement('input');
   inputCant.type = 'number';
   inputCant.id = 'cantProd';
   inputCant.min = '1';
   inputCant.value = '1';
-  inputCant.className = 'form-input-cant';
+  inputCant.className = 'form-input quantity-input';
   contProdWrap.appendChild(inputCant);
+  
   const btnAdd = document.createElement('button');
   btnAdd.type = 'button';
   btnAdd.id = 'btnAddProd';
-  btnAdd.className = 'btn-agregar-prod';
   btnAdd.textContent = 'Agregar producto';
+  btnAdd.className = 'btn-agregar';
   contProdWrap.appendChild(btnAdd);
-  colCampos.appendChild(contProdWrap);
+  
+  productSection.appendChild(contProdWrap);
 
-  // lista visual de productos elegidos
   const listaElegidos = document.createElement('div');
   listaElegidos.id = 'listaProdSeleccionados';
-  colCampos.appendChild(listaElegidos);
+  productSection.appendChild(listaElegidos);
+  
+  colCampos.appendChild(productSection);
   form.appendChild(colCampos);
 
-  // columna lateral con imagen
+  // Sección de imagen
   const colImagen = document.createElement('div');
-  colImagen.className = 'col-datos';
+  colImagen.className = 'form-group';
+  
+  const imageSection = document.createElement('div');
+  imageSection.className = 'form-section';
+  
+  const imageHeader = document.createElement('h3');
+  imageHeader.textContent = 'Imagen de la promoción';
+  imageSection.appendChild(imageHeader);
+  
   const labelImg = document.createElement('label');
   labelImg.htmlFor = 'inputImagen';
-  labelImg.className = 'custom-file-label';
   labelImg.textContent = 'Seleccionar imagen';
+  labelImg.className = 'custom-file-label';
+  
   const inpImagen = document.createElement('input');
   inpImagen.type = 'file';
   inpImagen.id = 'inputImagen';
   inpImagen.name = 'imagen';
   inpImagen.accept = 'image/*';
-  colImagen.appendChild(labelImg);
-  colImagen.appendChild(inpImagen);
+  // Mantener oculto el input real
+  inpImagen.style.display = 'none';
+  
+  const fileNameSpan = document.createElement('span');
+  fileNameSpan.className = 'file-name';
+  
   const preview = document.createElement('img');
   preview.id = 'previewPromo';
   preview.className = 'img-preview-form';
   preview.style.display = promo?.imagen ? '' : 'none';
-  preview.src = promo?.imagen || '';
-  colImagen.appendChild(preview);
+  preview.src = promo?.imagen ? escaparImagen(promo.imagen) : '';
+  
+  imageSection.appendChild(labelImg);
+  imageSection.appendChild(inpImagen);
+  imageSection.appendChild(fileNameSpan);
+  imageSection.appendChild(preview);
+  colImagen.appendChild(imageSection);
   form.appendChild(colImagen);
 
-  // botones guardar/cancelar
   const acciones = document.createElement('div');
   acciones.className = 'form-actions';
   const btnCancelar = document.createElement('button');
   btnCancelar.type = 'button';
-  btnCancelar.className = 'btn-cancelar';
   btnCancelar.textContent = 'Cancelar';
   acciones.appendChild(btnCancelar);
   const btnGuardar = document.createElement('button');
   btnGuardar.type = 'submit';
-  btnGuardar.className = 'btn-guardar';
   btnGuardar.textContent = promo ? 'Guardar' : 'Agregar';
   acciones.appendChild(btnGuardar);
   form.appendChild(acciones);
+
   cont.appendChild(form);
 
-  // preview de imagen al seleccionar
-  inpImagen.addEventListener('change', function () {
-    if (this.files?.[0]) {
-      preview.src = URL.createObjectURL(this.files[0]);
-      preview.style.display = '';
-    } else {
-      preview.style.display = 'none';
-      preview.src = '';
+  // Agregar funcionalidad de selección de imagen
+  labelImg.addEventListener('click', (e) => {
+    e.preventDefault();
+    inpImagen.click();
+  });
+
+  inpImagen.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+      fileNameSpan.textContent = file.name;
     }
   });
 
-  // actualizar lista de productos elegidos
   function actualizarListaElegidos() {
     listaElegidos.innerHTML = '';
     seleccionados.forEach((p, idx) => {
       const fila = document.createElement('div');
-      fila.className = 'prod-item';
-      const nombreSpan = document.createElement('span');
-      nombreSpan.className = 'prod-item-name';
-      nombreSpan.textContent = `${p.nombre} x ${p.cantidad}`;
-      fila.appendChild(nombreSpan);
-      const meta = document.createElement('div');
-      meta.className = 'prod-item-meta';
+      fila.textContent = `${p.nombre} x ${p.cantidad}`;
       const btnQuitar = document.createElement('button');
       btnQuitar.type = 'button';
-      btnQuitar.className = 'btn-quitar';
-      btnQuitar.title = 'Quitar';
       btnQuitar.textContent = '×';
       btnQuitar.addEventListener('click', () => {
         seleccionados.splice(idx, 1);
         actualizarListaElegidos();
       });
-      meta.appendChild(btnQuitar);
-      fila.appendChild(meta);
+      fila.appendChild(btnQuitar);
       listaElegidos.appendChild(fila);
     });
   }
 
   actualizarListaElegidos();
 
-  // agregar producto seleccionado
   btnAdd.addEventListener('click', () => {
     const id = selProd.value;
     const cantidad = parseInt(inputCant.value) || 0;
@@ -352,20 +414,70 @@ function mostrarFormularioPromo(promo = null) {
     actualizarListaElegidos();
   });
 
-  // cancelar: limpia el contenedor
   btnCancelar.addEventListener('click', () => { cont.innerHTML = ''; });
 
-  // envío del formulario
   form.addEventListener('submit', async e => {
     e.preventDefault();
     if (!seleccionados.length && !confirm('No hay productos. Guardar igual?')) return;
     const fd = new FormData(form);
     seleccionados.forEach(p => fd.append(`productos[${p.id}]`, p.cantidad));
     const url = promo ? 'editar_promocion.php' : 'agregar_promocion.php';
-    const res = await obtenerJson(url, { method: 'POST', body: fd });
+    const res = await fetchJson(url, { method: 'POST', body: fd });
     if (res?.ok) {
       cont.innerHTML = '';
-      mostrarListadoPromos();
+      mostrarTabla();
     } else alert(res?.error || 'Error en el servidor');
   });
 }
+
+// mostrarTabla: carga y muestra la tabla
+async function mostrarTabla() {
+  const datos = await fetchJson('listar_promociones.php');
+  renderizarTabla(datos);
+}
+
+// funciones helper
+function mostrarFormAgregar() {
+  mostrarFormularioPromo();
+}
+
+function mostrarFormEditar(id) {
+  fetchJson('listar_promociones.php').then(datos => {
+    const promo = datos.find(p => p.id_promocion == id);
+    if (promo) mostrarFormularioPromo(promo);
+  });
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btnAgregar')?.addEventListener('click', mostrarFormAgregar);
+  document.getElementById('btnBuscar')?.addEventListener('click', filtrarPromociones);
+  document.getElementById('clearFilters')?.addEventListener('click', limpiarFiltros);
+  document.getElementById('volver')?.addEventListener('click', () => location.href = '../menu.php');
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-id]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+
+    if (btn.classList.contains('btn-editar')) {
+      mostrarFormEditar(id);
+    } else if (btn.classList.contains('btn-borrar')) {
+      if (confirm('¿Borrar promoción?')) {
+        const fd = new FormData();
+        fd.append('id_promocion', id);
+        fetchJson('borrar_promocion.php', { method: 'POST', body: fd }).then(res => {
+          if (res?.ok) mostrarTabla();
+          else alert(res?.error || 'Error al borrar');
+        });
+      }
+    } else if (btn.classList.contains('btn-activar') || btn.classList.contains('btn-desactivar')) {
+      const estaActivo = btn.classList.contains('btn-desactivar');
+      cambiarActivo(id, !estaActivo).then(() => {
+        mostrarTabla();
+      });
+    }
+  });
+
+  mostrarTabla();
+});

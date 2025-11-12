@@ -19,6 +19,11 @@ if ($conexion) {
             // Guarda el id de la promoción actual
             $idProm = (int) $row['id_promocion'];
 
+            // Corregir la ruta de la imagen
+            if (!empty($row['imagen'])) {
+                $row['imagen'] = 'img/' . basename($row['imagen']);
+            }
+
             // Consulta secundaria: obtener los productos asociados a esta promoción
             $prodStmt = $conexion->prepare("
                 SELECT p.id_producto, p.nombre, pp.cantidad
@@ -44,10 +49,6 @@ if ($conexion) {
 
             // Asigna la lista de productos al array de salida
             $row['productos'] = $productos;
-
-            // Corrige la ruta de imagen si existe
-            if (!empty($row['imagen']))
-                $row['imagen'] = '../promociones/img/' . ltrim($row['imagen'], '/');
 
             // Agrega esta promoción completa (con productos) al array final
             $salida[] = $row;

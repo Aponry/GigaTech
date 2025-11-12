@@ -1,4 +1,106 @@
-/* reset básico y tipografía */
+/* Estilos generales *//* Product sections and cards */
+.product-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 0.5rem;
+}
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+}
+
+.card-img {
+  height: 150px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f6fa;
+}
+
+.card-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+.no-img {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1rem;
+  color: #2c3e50;
+}
+
+.card-desc {
+  margin: 0 1rem;
+  color: #666;
+  flex-grow: 1;
+  font-size: 0.9rem;
+}
+
+.card-price {
+  margin: 0 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #27ae60;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 1rem;
+  background: #f8f9fa;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .top-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .left-controls,
+  .search-controls {
+    justify-content: center;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-selection-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,18 +108,22 @@
   font-family: system-ui, sans-serif;
 }
 
-/* fondo y color principal. El JS no toca esto. */
 body {
   background: #f5f6fa;
   color: #333;
   padding: 20px;
 }
 
-/* encabezados usados en los forms renderizados por el JS */
 h1,
 h2 {
   color: #2c3e50;
   margin-bottom: 16px;
+}
+
+h3 {
+  color: #2c3e50;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
 }
 
 /* inputs/selects/buttons/textarea: mismos tamaños que espera el layout dinámico */
@@ -30,7 +136,7 @@ textarea {
 }
 
 /* ---- Barra superior: el JS agrega listeners a #buscarInput, #ver, #agregar, #volver y #limpiarFiltros ---- */
-/* contenedor que agrupa controles. Mantener flex para que el JS pueda ocultar/mostrar sin romper layout. */
+/* Controles superiores */
 .top-row {
   display: flex;
   justify-content: space-between;
@@ -39,22 +145,21 @@ textarea {
   margin-bottom: 20px;
 }
 
-/* agrupaciones internas. El JS usa estos contenedores para inyectar controles si hace falta */
-.controles-izquierda,
-.controles-busqueda {
+.left-controls,
+.search-controls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
 
-/* input de búsqueda. El script usa debounce sobre este elemento. No achicar su min-width. */
-#buscarInput {
+#searchInput,
+#filterTipo,
+#filterPermit {
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
   background: #fff;
-  min-width: 240px;
 }
 
 /* ---- Botones: estilos reutilizables que el JS apunta por ID/clase ---- */
@@ -73,27 +178,26 @@ button:hover {
   transform: translateY(-1px);
 }
 
-/* volver: neutro. usado por el listener que redirige a ../menu.php */
 #volver {
   background-color: #f0f0f0;
   color: #2c3e50;
 }
 
-/* agregar / guardar: el JS crea botones con .btn-guardar o #agregar */
-#agregar,
-.btn-guardar {
+#btnAgregar,
+.form-actions button[type="submit"] {
   background-color: #27ae60;
   color: #fff;
 }
 
-/* ver/listado: el botón #ver dispara la carga de la lista por JS */
-#ver {
+#btnVer,
+#btnBuscar,
+.btn-agregar {
   background-color: #3498db;
   color: #fff;
 }
 
-/* limpiar filtros: el listener resetea inputs y llama a mostrarListadoPromos/mostrarLista */
-#limpiarFiltros {
+#clearFilters,
+.form-actions button[type="button"] {
   background-color: #e74c3c;
   color: #fff;
 }
@@ -121,8 +225,7 @@ button:hover {
 }
 
 /* ---- Tabla de promociones/listados: #lista es donde el JS inyecta esta tabla ---- */
-/* tabla base para que el innerHTML que arma el JS quede consistente */
-.tabla-promos {
+.promociones-table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
@@ -162,8 +265,7 @@ button:hover {
 }
 
 /* ---- Formulario agregado por JS: contenedor #formPromo y #formulario ---- */
-/* caja del form: el script inserta <form id="formPromo"> con esta clase de estilos */
-#formPromo {
+form {
   background: #fff;
   padding: 20px;
   border-radius: 10px;
@@ -171,45 +273,56 @@ button:hover {
   margin-top: 20px;
 }
 
-/* grid adaptable: coincide con lo que usa renderizarFormulario / mostrarFormularioPromo */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  width: 100%;
 }
 
-/* columna de datos: el JS coloca inputs aquí (nombre, precio, descripción, lista de productos) */
-.col-datos {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.form-section {
+  margin-bottom: 25px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+.form-section h3 {
+  margin-top: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 
 /* grupos de campo: labels e inputs que el JS rellena con valores del backend */
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 15px;
 }
 
-/* label: visible y consistente con el texto que el JS inyecta */
 .form-group label {
   font-weight: 600;
-  font-size: 0.9rem;
   color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.form-hint {
+  font-size: 0.85rem;
+  color: #666;
 }
 
 .form-input,
 .form-select,
 textarea {
   width: 100%;
-  padding: 8px 10px;
+  padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  margin-top: 5px;
 }
 
 textarea {
-  min-height: 80px;
+  min-height: 100px;
   resize: vertical;
 }
 
@@ -259,11 +372,9 @@ textarea {
 }
 
 /* ---- Imagen: el JS maneja inputImagen y previewPromo, usar estas clases/ids para consistencia ---- */
-/* preview responsive usado por el script. Mantener aspect-ratio para no romper el form. */
 .img-preview-form {
-  width: 100%;
-  max-width: 250px;
-  aspect-ratio: 1/1;
+  width: 150px;
+  height: 150px;
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid #ddd;
@@ -275,27 +386,38 @@ input[type="file"] {
   display: none;
 }
 
-/* label clickeable que el JS muestra como trigger para seleccionar archivo */
+input[type="file"] {
+  display: none;
+}
+
 .custom-file-label {
   display: inline-block;
   background-color: #3498db;
   color: white;
-  padding: 8px 14px;
+  padding: 10px 16px;
   border-radius: 6px;
   cursor: pointer;
   text-align: center;
   max-width: 200px;
+  margin: 10px 0 5px 0;
+}
+
+.file-name {
+  font-size: 0.9rem;
+  color: #555;
+  word-break: break-all;
+  min-height: 1.2em;
+  margin-bottom: 10px;
 }
 
 /* ---- Acciones finales del formulario: el JS añade .form-actions y botones Cancelar/Guardar ---- */
-/* área de botones. el listener de cancel borra #formulario o vuelve a la lista dependiendo del flujo. */
+/* Acciones del formulario */
 .form-actions {
-  grid-column: 1 / -1;
   display: flex;
-  gap: 10px;
+  gap: 15px;
   justify-content: flex-end;
   width: 100%;
-  margin-top: 20px;
-  border-top: 1px solid #eee;
+  margin-top: 30px;
   padding-top: 20px;
+  border-top: 1px solid #eee;
 }
