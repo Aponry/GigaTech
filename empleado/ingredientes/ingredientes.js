@@ -1,227 +1,250 @@
-const TIPOS = JSON.parse(document.getElementById('tipos-json').textContent || '[]'); // Cargar tipos de ingredientes
+// escaparHtml no se usa en este archivo
 
-// Función para escapar caracteres especiales en el HTML
-function esc(texto) {
-  return String(texto ?? '').replace(/[&<>"'`=\/]/g, c => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#x2F;', '`': '&#x60;', '=': '&#x3D;'
-  })[c]);
-}
-
-// Función para hacer peticiones fetch con respuesta en formato JSON
+// fetchJson: hace fetch a la URL pasada y devuelve JSON
 async function fetchJson(url, opts = {}) {
   try {
     const r = await fetch(url, { cache: 'no-cache', ...opts });
     if (!r.ok) {
-      const txt = await r.text().catch(() => null);
-      throw new Error(`HTTP ${r.status} ${r.statusText}${txt ? ' — ' + txt : ''}`);
+      const errData = await r.json().catch(() => null);
+      throw { status: r.status, data: errData };
     }
     return await r.json();
   } catch (e) {
-    console.error('fetchJson error:', url, e);
+    const errorMsg = e.data?.error || `Error de conexión (${e.status || 'Cliente'})`;
+    alert(errorMsg);
     return null;
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('ver')?.addEventListener('click', mostrarLista); // Botón ver ingredientes
-  document.getElementById('agregar')?.addEventListener('click', mostrarFormularioAgregar); // Botón agregar ingrediente
-  document.getElementById('volver')?.addEventListener('click', () => location.href = '../menu.php'); // Botón volver
-
-  const buscarInput = document.getElementById('buscarInput');
-  const filtroTipo = document.getElementById('filtroTipo');
-  const limpiarBtn = document.getElementById('limpiarFiltros');
-
-  if (buscarInput) buscarInput.addEventListener('input', debounce(mostrarLista, 220)); // Búsqueda en tiempo real
-  if (filtroTipo) filtroTipo.addEventListener('change', mostrarLista); // Filtro por tipo
-  if (limpiarBtn) limpiarBtn.addEventListener('click', () => {
-    if (buscarInput) buscarInput.value = '';
-    if (filtroTipo) filtroTipo.value = '';
-    mostrarLista();
-  });
-
-  mostrarLista(); // Mostrar lista inicial
-});
-
-// Función para debouncing en búsqueda
-function debounce(fn, ms = 200) {
-  let t;
-  return function (...a) { clearTimeout(t); t = setTimeout(() => fn.apply(this, a), ms); };
+// mostrarMensaje: marcador de posición para mensajes
+function mostrarMensaje(msg, type) {
+  alert(msg);
 }
 
-// Mostrar la lista de ingredientes
-async function mostrarLista() {
-  const buscarInput = document.getElementById('buscarInput');
-  const filtroTipo = document.getElementById('filtroTipo');
+// Función para filtrar ingredientes
+function filtrarIngredientes() {
+  const searchInput = document.getElementById('searchInput');
+  const query = searchInput ? searchInput.value.toLowerCase() : '';
+  const items = document.querySelectorAll('#ingredientes-section .product-card');
 
-  const datos = await fetchJson('listar_ingredientes.php'); // Obtener ingredientes
-  const cont = document.getElementById('lista');
-  const contForm = document.getElementById('formulario');
-  cont.innerHTML = '';
-  contForm.innerHTML = '';
+  items.forEach(item => {
+    const name = item.getAttribute('data-name');
+    const matchesName = name.includes(query);
+    item.style.display = matchesName ? '' : 'none';
+  });
+
+  // Ocultar secciones si no hay tarjetas que coincidan
+  const sections = document.querySelectorAll('#ingredientes-section .product-section');
+  sections.forEach(section => {
+    const cards = section.querySelectorAll('.product-card');
+    let hasVisible = false;
+    cards.forEach(card => {
+      if (card.style.display !== 'none') {
+        hasVisible = true;
+      }
+    });
+    section.style.display = hasVisible ? '' : 'none';
+  });
+}
+
+// Función para limpiar filtros
+function limpiarFiltros() {
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.value = '';
+  filtrarIngredientes();
+}
+
+// renderizarCards: arma las cards de ingredientes
+function renderizarCards(datos) {
+  const cont = document.getElementById('ingredientes-section');
+  if (!cont) return;
 
   if (!Array.isArray(datos) || !datos.length) {
-    cont.textContent = 'No hay ingredientes';
+    cont.innerHTML = '<p>No hay ingredientes</p>';
     return;
   }
 
-  let lista = datos.slice();
-  const q = (buscarInput && buscarInput.value || '').toString().trim().toLowerCase();
-  if (q) {
-    lista = lista.filter(it =>
-      String(it.id_ingrediente).includes(q) ||
-      (it.nombre && it.nombre.toString().toLowerCase().includes(q))
-    );
-  }
+  // Group by tipo
+  const groups = datos.reduce((acc, ing) => {
+    (acc[ing.tipo_producto] = acc[ing.tipo_producto] || []).push(ing);
+    return acc;
+  }, {});
 
-  const tipoSel = filtroTipo && filtroTipo.value;
-  if (tipoSel) {
-    lista = lista.filter(it => (it.tipo_producto || '').toString().toLowerCase() === tipoSel.toString().toLowerCase());
-  }
+  const displayTipos = { pizza: 'Pizza', hamburguesa: 'Hamburger' };
 
-  const tabla = document.createElement('table');
-  tabla.className = 'ingredientes-table';
+  cont.innerHTML = '';
 
-  const thead = tabla.createTHead();
-  const hr = thead.insertRow();
-  ['ID', 'Nombre', 'Tipo', 'Costo', 'Acciones'].forEach(h => {
-    const th = document.createElement('th');
-    th.textContent = h;
-    hr.appendChild(th);
-  });
+  Object.keys(groups).forEach(tipo => {
+    const section = document.createElement('section');
+    section.className = 'product-section';
+    section.id = 'ingredientes-' + tipo;
+    section.innerHTML = `<h2 class="section-title">${displayTipos[tipo]}</h2><div class="section-grid"></div>`;
+    const grid = section.querySelector('.section-grid');
 
-  const tbody = tabla.createTBody();
-  lista.forEach(item => {
-    const tr = tbody.insertRow();
-    tr.insertCell().textContent = item.id_ingrediente;
-    tr.insertCell().textContent = item.nombre;
-    tr.insertCell().textContent = item.tipo_producto;
-    tr.insertCell().textContent = (Number(item.costo) || 0).toFixed(2);
-
-    const tdAcc = tr.insertCell();
-    tdAcc.style.textAlign = 'center';
-    tdAcc.style.whiteSpace = 'nowrap';
-
-    // Botón para editar ingrediente
-    const btnEditar = document.createElement('button');
-    btnEditar.type = 'button';
-    btnEditar.className = 'btn-editar';
-    btnEditar.textContent = 'Editar';
-    btnEditar.addEventListener('click', () => mostrarFormularioEditar(item));
-    tdAcc.appendChild(btnEditar);
-
-    // Botón para borrar ingrediente
-    const btnBorrar = document.createElement('button');
-    btnBorrar.type = 'button';
-    btnBorrar.className = 'btn-borrar';
-    btnBorrar.textContent = 'Borrar';
-    btnBorrar.addEventListener('click', async () => {
-      if (!confirm('¿Borrar ingrediente?')) return;
-      btnBorrar.disabled = true;
-      const fd = new FormData();
-      fd.append('id_ingrediente', item.id_ingrediente);
-      const res = await fetchJson('borrar_ingredientes.php', { method: 'POST', body: fd });
-      btnBorrar.disabled = false;
-      if (!res) return alert('Error al borrar');
-      if (!res.ok) return alert(res.error || 'No se pudo borrar');
-      mostrarLista();
+    groups[tipo].forEach(ing => {
+      const card = document.createElement('article');
+      card.className = 'product-card';
+      card.setAttribute('data-name', (ing.nombre || '').toLowerCase());
+      card.setAttribute('data-tipo', ing.tipo_producto);
+      card.innerHTML = `
+        <h3>${ing.nombre}</h3>
+        <div class="costo" style="font-weight: bold;">Costo: $${ing.costo}</div>
+        <div class="price">Stock: ${ing.stock ?? 0}</div>
+        <div class="card-actions">
+          <button class="btn-editar" data-id="${ing.id_ingrediente}">Editar</button>
+          <button class="btn-borrar" data-id="${ing.id_ingrediente}">Borrar</button>
+        </div>
+      `;
+      grid.appendChild(card);
     });
-    tdAcc.appendChild(btnBorrar);
-  });
 
-  cont.appendChild(tabla);
+    cont.appendChild(section);
+  });
 }
 
-// Función para crear el select de tipos de ingredientes
-function crearSelectTipos(seleccion = '') {
-  const s = document.createElement('select');
-  s.name = 'tipo_producto';
-  TIPOS.forEach(t => {
-    const o = document.createElement('option');
-    o.value = t;
-    o.textContent = t.charAt(0).toUpperCase() + t.slice(1);
-    if (String(t).toLowerCase() === String(seleccion).toLowerCase()) o.selected = true;
-    s.appendChild(o);
-  });
-  return s.outerHTML;
-}
-
-// Función para mostrar el formulario de agregar ingrediente
-function mostrarFormularioAgregar() {
+// mostrarFormularioIngrediente: muestra formulario de alta/edición de ingrediente
+function mostrarFormularioIngrediente(ingrediente = null) {
   const cont = document.getElementById('formulario');
-  cont.innerHTML = `
-    <form id="formAgregar" novalidate>
-      <input name="nombre" placeholder="Nombre" required>
-      ${crearSelectTipos('')}
-      <input name="costo" placeholder="Costo" required inputmode="decimal">
-      <div class="form-actions" style="margin-top:8px;">
-        <button type="button" id="cancelAgregar" class="btn-cancel">Cancelar</button>
-        <button type="submit" class="btn-save">Agregar</button>
-      </div>
-    </form>
-  `;
-  document.getElementById('cancelAgregar')?.addEventListener('click', () => cont.innerHTML = '');
+  if (!cont) return;
+  cont.innerHTML = '';
 
-  const form = document.getElementById('formAgregar');
-  form.addEventListener('submit', async (e) => {
+  const card = document.createElement('div');
+  card.className = 'form-card';
+
+  const form = document.createElement('form');
+  form.id = 'formIngrediente';
+  form.className = 'form-container';
+
+  if (ingrediente) {
+    const hid = document.createElement('input');
+    hid.type = 'hidden';
+    hid.name = 'id_ingrediente';
+    hid.value = ingrediente.id_ingrediente;
+    form.appendChild(hid);
+  }
+
+  const row = document.createElement('div');
+  row.className = 'form-row';
+
+  // Name field
+  const nameDiv = document.createElement('div');
+  const lblNombre = document.createElement('label');
+  lblNombre.className = 'form-label';
+  lblNombre.textContent = 'Nombre';
+  nameDiv.appendChild(lblNombre);
+  const inpNombre = document.createElement('input');
+  inpNombre.name = 'nombre';
+  inpNombre.placeholder = 'Nombre';
+  inpNombre.required = true;
+  inpNombre.value = ingrediente?.nombre ?? '';
+  inpNombre.className = 'form-input';
+  nameDiv.appendChild(inpNombre);
+  row.appendChild(nameDiv);
+
+  // Price field
+  const priceDiv = document.createElement('div');
+  const lblPrecio = document.createElement('label');
+  lblPrecio.className = 'form-label';
+  lblPrecio.textContent = 'Precio';
+  priceDiv.appendChild(lblPrecio);
+  const inpPrecio = document.createElement('input');
+  inpPrecio.name = 'costo';
+  inpPrecio.type = 'number';
+  inpPrecio.step = '0.01';
+  inpPrecio.placeholder = 'Precio';
+  inpPrecio.required = true;
+  inpPrecio.value = ingrediente?.costo ?? '';
+  inpPrecio.className = 'form-input';
+  priceDiv.appendChild(inpPrecio);
+  row.appendChild(priceDiv);
+
+  form.appendChild(row);
+
+  // Description field
+  const lblDesc = document.createElement('label');
+  lblDesc.className = 'form-label';
+  lblDesc.textContent = 'Descripción';
+  form.appendChild(lblDesc);
+  const inpDesc = document.createElement('textarea');
+  inpDesc.name = 'descripcion';
+  inpDesc.placeholder = 'Descripción';
+  inpDesc.value = ingrediente?.descripcion ?? '';
+  inpDesc.className = 'form-input';
+  form.appendChild(inpDesc);
+
+  const acciones = document.createElement('div');
+  acciones.className = 'form-actions';
+  const btnCancelar = document.createElement('button');
+  btnCancelar.type = 'button';
+  btnCancelar.textContent = 'Cancelar';
+  acciones.appendChild(btnCancelar);
+  const btnGuardar = document.createElement('button');
+  btnGuardar.type = 'submit';
+  btnGuardar.textContent = ingrediente ? 'Guardar' : 'Agregar';
+  acciones.appendChild(btnGuardar);
+  form.appendChild(acciones);
+
+  card.appendChild(form);
+  cont.appendChild(card);
+
+  btnCancelar.addEventListener('click', () => { cont.innerHTML = ''; });
+
+  form.addEventListener('submit', async e => {
     e.preventDefault();
-    const btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true;
     const fd = new FormData(form);
-    if (fd.has('costo')) fd.set('costo', String(fd.get('costo') || '').trim().replace(',', '.'));
-    const res = await fetchJson('agregar_ingrediente.php', { method: 'POST', body: fd });
-    btn.disabled = false;
-    if (!res) { alert('Error al agregar'); return; }
-    if (!res.ok) { alert(res.error || 'No se pudo agregar'); return; }
-    cont.innerHTML = '';
-    mostrarLista();
+    const url = ingrediente ? 'editar_ingrediente.php' : 'agregar_ingrediente.php';
+    const res = await fetchJson(url, { method: 'POST', body: fd });
+    if (res?.ok) {
+      cont.innerHTML = '';
+      mostrarCards();
+    } else alert(res?.error || 'Error en el servidor');
   });
 }
 
-// Función para mostrar el formulario de editar ingrediente
-function mostrarFormularioEditar(item) {
-  const cont = document.getElementById('formulario');
-  cont.innerHTML = `
-    <form id="formEditar" novalidate>
-      <input type="hidden" name="id_ingrediente" value="${esc(item.id_ingrediente)}">
-      <input name="nombre" value="${esc(item.nombre)}" placeholder="Nombre" required>
-      ${crearSelectTipos(item.tipo_producto || '')}
-      <input name="costo" value="${esc(Number(item.costo || 0).toFixed(2))}" placeholder="Costo" required inputmode="decimal">
-      <div class="form-actions" style="margin-top:8px;">
-        <button type="button" id="cancelEditar" class="btn-cancel">Cancelar</button>
-        <button type="submit" class="btn-save">Guardar</button>
-        <button type="button" id="deleteEditar" class="btn-delete">Borrar</button>
-      </div>
-    </form>
-  `;
+// mostrarCards: carga y muestra las cards
+async function mostrarCards() {
+  const datos = await fetchJson('listar_ingredientes.php');
+  renderizarCards(datos);
+}
 
-  document.getElementById('cancelEditar')?.addEventListener('click', () => cont.innerHTML = '');
+// funciones helper
+function mostrarFormAgregar() {
+  mostrarFormularioIngrediente();
+}
 
-  const form = document.getElementById('formEditar');
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true;
-    const fd = new FormData(form);
-    if (fd.has('costo')) fd.set('costo', String(fd.get('costo') || '').trim().replace(',', '.'));
-    const res = await fetchJson('editar_ingredientes.php', { method: 'POST', body: fd });
-    btn.disabled = false;
-    if (!res) { alert('Error al guardar'); return; }
-    if (!res.ok) { alert(res.error || 'No se pudo guardar'); return; }
-    cont.innerHTML = '';
-    mostrarLista();
-  });
-
-  document.getElementById('deleteEditar')?.addEventListener('click', async () => {
-    if (!confirm('¿Borrar ingrediente?')) return;
-    const btn = document.getElementById('deleteEditar');
-    btn.disabled = true;
-    const fd = new FormData();
-    fd.append('id_ingrediente', item.id_ingrediente);
-    const res = await fetchJson('borrar_ingredientes.php', { method: 'POST', body: fd });
-    btn.disabled = false;
-    if (!res) return alert('Error al borrar');
-    if (!res.ok) return alert(res.error || 'No se pudo borrar');
-    cont.innerHTML = '';
-    mostrarLista();
+function mostrarFormEditar(id) {
+  fetchJson('listar_ingredientes.php').then(datos => {
+    const ing = datos.find(i => i.id_ingrediente == id);
+    if (ing) mostrarFormularioIngrediente(ing);
   });
 }
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btnAgregar')?.addEventListener('click', mostrarFormAgregar);
+  document.getElementById('searchInput')?.addEventListener('input', filtrarIngredientes);
+  document.getElementById('btnBuscar')?.addEventListener('click', filtrarIngredientes);
+  document.getElementById('clearFilters')?.addEventListener('click', limpiarFiltros);
+  document.getElementById('volver')?.addEventListener('click', () => location.href = '../menu.php');
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-id]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+
+    if (btn.classList.contains('btn-editar')) {
+      mostrarFormEditar(id);
+    } else if (btn.classList.contains('btn-borrar')) {
+      if (confirm('¿Borrar ingrediente?')) {
+        const fd = new FormData();
+        fd.append('id_ingrediente', id);
+        fetchJson('borrar_ingrediente.php', { method: 'POST', body: fd }).then(res => {
+          if (res?.ok) mostrarCards();
+          else alert(res?.error || 'Error al borrar');
+        });
+      }
+    }
+  });
+
+  mostrarCards();
+});

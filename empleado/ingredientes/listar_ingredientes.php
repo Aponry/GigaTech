@@ -14,7 +14,7 @@ if (!$db) {
 }
 
 // Consulta SQL para obtener los ingredientes ordenados por nombre
-$sql = "SELECT id_ingrediente, nombre, tipo_producto, costo FROM ingrediente ORDER BY nombre ASC";
+$sql = "SELECT id_ingrediente, nombre, tipo_producto, costo, stock FROM ingrediente ORDER BY nombre ASC";
 $res = $db->query($sql); // Ejecutamos la consulta
 
 $lista = []; // Array para almacenar los resultados
