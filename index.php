@@ -9,7 +9,7 @@
 		content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:;">
 	<title>PizzaConmigo</title>
 	<link rel="icon" href="img/PizzaConmigo.ico" type="image/x-icon">
-	<!-- Fonts & minimal preconnect for performance -->
+	<!-- Configuración de fuentes y preconexión mínima para optimizar el rendimiento -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -143,7 +143,7 @@
 			</div>
 		</div>
 		<div class="header-right">
-			<!-- container for dynamic section buttons (pizzas, hamburguesas, etc) -->
+			<!-- Contenedor para los botones de secciones dinámicas (pizzas, hamburguesas, etc.) -->
 			<div id="sectionButtons" class="section-buttons" aria-hidden="false"></div>
 			<button id="ordersBtn" class="cart-toggle" aria-label="Ver mis pedidos">
 				<i class="fas fa-clipboard-list"></i> Mis Pedidos
@@ -152,7 +152,7 @@
 		</div>
 	</header>
 
-	<!-- Hero section -->
+	<!-- Seccion hero -->
 	<section class="hero">
 		<div class="hero-content">
 			<h2>¡Bienvenido a PizzaConmigo!</h2>
@@ -162,10 +162,10 @@
 	</section>
 
 	<main id="products">
-		<!-- Small demo product list. Keep data shapes minimal and explicit. -->
+		<!-- Lista de productos de demostración simple. Las estructuras de datos deben ser mínimas y claras -->
 	</main>
 
-	<!-- Cart Panel -->
+	<!-- Panel del carrito -->
 	<div id="cart-panel" class="cart-panel">
 		<div class="cart-header">
 			<h3>Carrito</h3>
@@ -348,7 +348,7 @@
 					carousel.querySelector('.carousel-next').addEventListener('click', () => { idx = (idx + 1) % slides.length; show(idx); });
 					carousel.querySelector('.carousel-prev').addEventListener('click', () => { idx = (idx - 1 + slides.length) % slides.length; show(idx); });
 
-					// Update current slide indicator text
+					// Actualiza el texto del indicador de la diapositiva actual
 					function updateCurrentSlide() {
 						const currentPromo = promos[idx];
 						const currentDot = indicators.children[idx];
@@ -357,7 +357,7 @@
 						}
 					}
 					updateCurrentSlide();
-					// Update when slide changes
+					// Se actualiza al cambiar la diapositiva
 					const originalShow = show;
 					show = function(i) {
 						originalShow(i);
@@ -467,7 +467,7 @@
 								const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b);
 								const textColor = luminance < 140 ? '#ffffff' : '#000000';
 								const accent = `rgb(${r}, ${g}, ${b})`;
-								// darker variant
+								// Versión más oscura
 								const dark = `rgb(${Math.max(0, r - 40)}, ${Math.max(0, g - 40)}, ${Math.max(0, b - 40)})`;
 								document.documentElement.style.setProperty('--modal-accent', accent);
 								document.documentElement.style.setProperty('--modal-accent-2', dark);
@@ -479,7 +479,7 @@
 					});
 				};
 				// aplicarPaletaDesdeLogo('img/Pizzaconmigo.png').then(() => {
-				// 	// Asegurar que el texto sea siempre negro para legibilidad en fondo blanco del modal
+				// Asegurar que el texto sea siempre negro para legibilidad en fondo blanco del modal
 				// 	document.documentElement.style.setProperty('--modal-text', '#000000');
 				// }).catch(() => { });
 
@@ -539,7 +539,7 @@
 					`;
 			document.body.appendChild(footer);
 
-			// Initialize cart functionality
+			// Inicializa la funcion carrito
 			initCart();
 		})();
 
@@ -564,7 +564,7 @@
 			}
 		});
 
-		// Initialize pedidos functionality
+		// Inicia la funcionalidad pedidos
 		if (typeof createOrderModal === 'function') {
 		    createOrderModal();
 		}
