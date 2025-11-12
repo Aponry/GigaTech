@@ -1,0 +1,239 @@
+/* Estilos para la página de pedidos de empleado - mismos colores que index.php */
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #333333;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filters label {
+    font-weight: 600;
+}
+
+.filters input,
+.filters select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #333333;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #555555;
+}
+
+.btn-secondary {
+    background-color: #333333;
+}
+
+.btn-secondary:hover {
+    background-color: #555555;
+}
+
+.btn-success {
+    background-color: #333333;
+}
+
+.btn-success:hover {
+    background-color: #555555;
+}
+
+.btn-warning {
+    background-color: #333333;
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #555555;
+}
+
+.btn-danger {
+    background-color: #333333;
+}
+
+.btn-danger:hover {
+    background-color: #555555;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th {
+    background-color: #333333;
+    font-weight: 600;
+    color: white;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f3f4;
+}
+
+.status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    background-color: #333333;
+    color: white;
+}
+
+.status.pendiente {
+    background-color: #333333;
+    color: white;
+}
+
+.status.confirmado {
+    background-color: #333333;
+    color: white;
+}
+
+.status.en_preparacion {
+    background-color: #333333;
+    color: white;
+}
+
+.status.listo {
+    background-color: #333333;
+    color: white;
+}
+
+.status.en_reparto {
+    background-color: #333333;
+    color: white;
+}
+
+.status.entregado {
+    background-color: #333333;
+    color: white;
+}
+
+.status.cancelado {
+    background-color: #333333;
+    color: white;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+.order-details h3 {
+    color: #333333;
+    margin-top: 1rem;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.total {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: white;
+    background-color: #333333;
+}
+
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .actions {
+        flex-direction: column;
+    }
+    .table {
+        font-size: 0.9rem;
+    }
+    .table th,
+    .table td {
+        padding: 0.5rem;
+    }
+}
