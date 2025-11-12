@@ -33,7 +33,7 @@
 			}
 		}
 
-		/* Carousel navigation improvements */
+		/* Mejoras en la navegación del carrusel */
 		.carousel-prev, .carousel-next {
 			background: rgba(0, 0, 0, 0.7);
 			color: white;
