@@ -95,7 +95,7 @@ button:hover {
 }
 
 .btn-borrar {
-  background-color: #e74c3e;
+  background-color: #e74c3c;
   color: #fff;
 }
 
@@ -222,4 +222,630 @@ input[type="file"] {
   justify-content: flex-end;
   width: 100%;
   margin-top: 20px;
+}
+/* Product sections and cards */
+.product-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 0.5rem;
+}
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+}
+
+.card-img {
+  height: 150px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f6fa;
+}
+
+.card-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+.no-img {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1rem;
+  color: #2c3e50;
+}
+
+.card-desc {
+  margin: 0 1rem;
+  color: #666;
+  flex-grow: 1;
+  font-size: 0.9rem;
+}
+
+.card-price {
+  margin: 0 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #27ae60;
+}
+
+.card-actions {
+  margin: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.card-actions button {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .section-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  .product-card {
+    margin-bottom: 1rem;
+  }
+}
+/* Reset y configuración base del documento */
+/* Aplica box-sizing border-box a todos los elementos para incluir padding y border en el ancho/alto */
+/* Resetea márgenes y padding por defecto */
+/* Establece fuente del sistema como predeterminada */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+}
+
+/* Estilos para el cuerpo de la página */
+/* Fondo gris claro, color de texto azul oscuro, padding de 20px */
+body {
+  background: #f4f6f8;
+  color: #2d3a4a;
+  padding: 20px;
+}
+
+/* Estilos para el título principal h1 */
+/* Color azul oscuro, margen inferior, centrado */
+h1 {
+  color: #1f3d68;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Estilos para los títulos de sección h2 */
+/* Color azul oscuro, margen inferior */
+h2 {
+  color: #1f3d68;
+  margin-bottom: 16px;
+}
+
+/* Controles superiores de la página */
+/* Fila superior con distribución de espacio entre elementos */
+/* Flexbox con wrap para responsive, gap entre elementos */
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* Controles izquierdo y de búsqueda */
+/* Flexbox horizontal con wrap, elementos centrados verticalmente */
+.left-controls,
+.search-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Estilos para elementos de formulario */
+/* Tamaño de fuente consistente, hereda fuente del padre */
+input,
+select,
+button,
+textarea {
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+/* Estilos para inputs de búsqueda y filtros */
+/* Padding interno, bordes redondeados, borde gris, fondo blanco */
+#searchInput,
+#filterTipo,
+#filterPermit {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+/* Estilos base para todos los botones */
+/* Padding interno, sin borde, bordes redondeados, cursor pointer */
+/* Peso de fuente seminegrita, transición suave */
+button {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+/* Efecto hover para botones: elevación sutil */
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* Estilos específicos para botones por ID o clase */
+/* Botón volver: fondo gris claro, texto oscuro */
+#volver {
+  background-color: #f0f0f0;
+  color: #2d3a4a;
+}
+
+/* Botones de agregar y submit: fondo verde, texto blanco */
+#btnAgregar,
+.form-actions button[type="submit"] {
+  background-color: #27ae60;
+  color: #fff;
+}
+
+/* Botones de ver y buscar: fondo azul, texto blanco */
+#btnVer,
+#btnBuscar {
+  background-color: #2f5f9c;
+  color: #fff;
+}
+
+/* Botones de limpiar filtros y cancelar: fondo rojo, texto blanco */
+#clearFilters,
+.form-actions button[type="button"] {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+/* Botón editar: fondo gris oscuro, texto blanco */
+.btn-editar {
+  background-color: #333333;
+  color: #fff;
+}
+
+/* Botón borrar: fondo rojo, texto blanco */
+.btn-borrar {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+/* Estilos para las tarjetas de productos (similares a filas de tabla) */
+/* Fondo blanco, bordes redondeados, sombra sutil, borde gris */
+/* Altura mínima, ancho máximo, flexbox vertical, transición suave */
+.product-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #dee2e6;
+  margin-bottom: 0;
+  padding: 0.75rem;
+  min-height: 250px;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+/* Efecto hover para tarjetas: elevación y sombra más pronunciada */
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(11,23,32,0.08);
+}
+
+/* Imagen superior de la tarjeta */
+/* Ancho fijo, altura automática, ajusta imagen sin recortar */
+/* Bordes redondeados, centrada horizontalmente */
+.product-card .card-img-top {
+  width: 15em;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Cuerpo de la tarjeta */
+/* Sin padding, ocupa espacio restante, flexbox vertical */
+.product-card .card-body {
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Título de la tarjeta */
+/* Color azul oscuro, margen inferior, centrado */
+.product-card .card-title {
+  color: #1f3d68;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Texto de la tarjeta */
+/* Margen inferior, centrado */
+.product-card .card-text {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Elementos de formulario */
+/* Etiquetas de formulario: peso seminegrita, color azul, tamaño pequeño, margen inferior */
+.form-label {
+  font-weight: 600;
+  color: #1f3d68;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+/* Controles de formulario: ancho completo, padding, borde gris, bordes redondeados, fondo blanco */
+.form-control {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* Botón primario: fondo azul, texto blanco */
+.btn-primary {
+  background-color: #2f5f9c;
+  color: #fff;
+}
+
+/* Botón secundario: fondo gris oscuro, texto blanco */
+.btn-secondary {
+  background-color: #333333;
+  color: #fff;
+}
+
+/* Clases de utilidad flexbox */
+/* Display flex */
+.d-flex {
+  display: flex;
+}
+
+/* Justificar contenido con espacio entre elementos */
+.justify-content-between {
+  justify-content: space-between;
+}
+
+/* Footer mejorado */
+.site-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 0;
+  margin-top: 2rem;
+  background: #f8f9fa;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0 20px;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.footer-col {
+  flex: 1;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.footer-col h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.footer-col p {
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.contact-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #3498db;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.3s ease, transform 0.2s ease;
+  white-space: nowrap;
+}
+
+.contact-btn:hover {
+  background: #2980b9;
+  transform: translateY(-1px);
+}
+
+/* Ajustes para móviles */
+@media (max-width: 768px) {
+  .footer-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .contact-buttons {
+    justify-content: center;
+  }
+  
+  .footer-col {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Botones pequeños: padding reducido, fuente pequeña, bordes menos redondeados */
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+/* Badges: fuente pequeña, padding, bordes redondeados */
+.badge {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* Badge de éxito: fondo verde (importante para override) */
+.bg-success {
+  background-color: #27ae60 !important;
+}
+
+/* Badge de peligro: fondo rojo (importante para override) */
+.bg-danger {
+  background-color: #e74c3c !important;
+}
+
+/* Menús fijos (sticky) */
+/* Comportamiento de scroll suave para toda la página */
+html { scroll-behavior: smooth; }
+
+/* Partes del menú */
+.menu-part {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex: 1;
+}
+.menu-label {
+    font-weight: bold;
+    font-size: 12px;
+    color: #2f5f9c;
+    text-align: center;
+}
+/* Botones de sección en la parte inferior */
+/* Posición fija abajo, ancho completo, fondo blanco, borde superior */
+/* Padding, flexbox centrado, z-index alto, sombra superior */
+.section-buttons-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid #d2d8e0;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+    z-index: 1000;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+/* Estilos para botones de sección */
+/* Sin fondo ni borde, padding, bordes redondeados, cursor pointer */
+/* Peso seminegrita, color gris, ancho mínimo, transición */
+.section-button {
+    background: none;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #495057;
+    min-width: fit-content;
+    transition: all 0.2s;
+}
+/* Hover para botones de sección: fondo gris claro */
+.section-button:hover {
+    background: #f8f9fa;
+}
+/* Botón de scroll hacia arriba */
+/* Posición fija abajo a la derecha, fondo gris oscuro, texto blanco */
+/* Sin borde, dimensiones cuadradas, borde circular, fuente grande */
+/* Cursor pointer, z-index alto, transición, sombra */
+.scroll-to-top {
+    position: fixed;
+    bottom: 70px;
+    left: 20px;
+    background: #333333;
+    color: #fff;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+/* Hover para botón scroll: fondo más claro, elevación, sombra más grande */
+.scroll-to-top:hover {
+    background: #555555;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Ajustes de filas y columnas */
+/* Clase row: grid con columnas automáticas de mínimo 300px */
+/* Gap entre elementos, items centrados */
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
+/* Grid para secciones: similar a row pero para secciones específicas */
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
+/* Columna mediana: flex 1 con ancho calculado, mínimo 300px */
+.col-md-4 {
+  flex: 1 1 calc(33.333% - 20px);
+  min-width: 300px;
+}
+
+/* Contenedor principal: ancho máximo 1200px, centrado, padding lateral y bottom extra */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+/* Texto centrado */
+.text-center {
+  text-align: center;
+}
+
+/* Clases de margen inferior (margin-bottom) */
+/* mb-4, mb-3, mb-2, mb-5: márgenes de 1rem base */
+.mb-4, .mb-3, .mb-2, .mb-5 {
+  margin-bottom: 1rem;
+}
+
+/* Márgenes específicos para cada clase */
+.mb-4 { margin-bottom: 1.5rem; }
+.mb-3 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-5 { margin-bottom: 3rem; }
+
+/* Padding vertical de 1.5rem */
+.py-4 {
+  padding: 1.5rem 0;
+}
+
+/* Media queries para responsive design */
+/* Para pantallas menores a 720px */
+@media (max-width: 720px) {
+  /* Grids se convierten en columna única */
+  .row,
+  .section-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Para pantallas menores a 480px (móviles pequeños) */
+@media (max-width: 480px) {
+  /* Body con padding reducido */
+  body {
+    padding: 10px;
+  }
+
+  /* Container con padding lateral reducido */
+  .container {
+    padding: 0 10px;
+  }
+
+  /* Fila superior en columna, elementos centrados */
+  .top-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Controles centrados */
+  .left-controls,
+  .search-controls {
+    justify-content: center;
+  }
+
+  /* Imágenes de tarjetas más pequeñas */
+  .card-img-top {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  /* Botones de sección más pequeños */
+  .section-button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    min-width: auto;
+  }
+
+  /* Menú inferior con padding reducido */
+  .section-buttons-bottom {
+    padding: 8px;
+  }
 }

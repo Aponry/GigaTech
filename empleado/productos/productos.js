@@ -1,6 +1,7 @@
 // TIPOS: lista de tipos de productos que vienen del HTML (probablemente renderizados desde PHP)
 // ojo que si no existe el elemento #tipos-json devuelve array vacío
-const TIPOS = JSON.parse(document.getElementById('tipos-json')?.textContent || '[]');
+const tiposEl = document.getElementById('tipos-json');
+const TIPOS = JSON.parse(tiposEl ? tiposEl.textContent : '[]');
 
 // escaparHtml: escapa caracteres especiales para evitar que se rompa el HTML
 // útil para prevenir XSS o que se meta cualquier cosa en los inputs
@@ -16,6 +17,10 @@ function escaparHtml(s) {
     '=': '&#x3D;',
   })[c]);
 }
+// mostrarMensaje: marcador de posición para mensajes
+function mostrarMensaje(msg, type) {
+  alert(msg);
+}
 
 // fetchJson: hace fetch a la URL pasada y devuelve JSON
 // si hay error lo maneja mostrando mensaje
@@ -30,72 +35,12 @@ async function fetchJson(url, opts = {}) {
     return await r.json();
   } catch (e) {
     const errorMsg = e.data?.error || `Error de conexión (${e.status || 'Cliente'})`;
-    mostrarMensaje(errorMsg, 'error'); // asumimos que mostrarMensaje es una función global
+    mostrarMensaje(errorMsg, 'error');
     return null;
   }
 }
 
-// debounceMostrar: evita que mostrarLista se llame mil veces al tipear en filtros
-let _t;
-function debounceMostrar() { clearTimeout(_t); _t = setTimeout(mostrarLista, 200); }
-
-// mostrarLista: trae la lista de productos y renderiza la tabla
-// ojo que no toca eventos de botones acá, solo pinta la tabla
-async function mostrarLista() {
-  const datos = await fetchJson('listar_productos.php'); // traemos los productos
-  const listaEl = document.getElementById('lista');
-  listaEl.innerHTML = ''; // limpiamos lista
-  document.getElementById('formulario').innerHTML = ''; // limpiamos form si estaba
-
-  if (!datos?.length) {
-    listaEl.innerHTML = '<p>No hay productos para mostrar.</p>';
-    return;
-  }
-
-  // agarramos filtros y busqueda
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const tipoSel = document.getElementById('filterTipo').value.toLowerCase();
-  const permite = document.getElementById('filterPermit').value;
-
-  // filtramos según búsqueda, tipo y permitir ingredientes
-  const items = datos.filter(p => (
-    (!q || p.id_producto.includes(q) || p.nombre.toLowerCase().includes(q) || p.tipo.toLowerCase().includes(q)) &&
-    (!tipoSel || p.tipo.toLowerCase() === tipoSel) &&
-    (permite === '' || String(p.permitir_ingredientes) === permite)
-  ));
-
-  // armamos la tabla
-  const tabla = document.createElement('table');
-  tabla.className = 'productos-table';
-  tabla.innerHTML = `<thead><tr><th>ID</th><th>Foto</th><th>Nombre</th><th>Tipo</th><th>Precio</th><th>Descripción</th><th>Permite ing.</th><th>Acciones</th></tr></thead>`;
-  const tbody = document.createElement('tbody');
-
-  items.forEach(p => {
-    const tr = document.createElement('tr');
-    // si hay imagen, la mostramos, sino "Sin foto"
-    const imgSrc = p.imagen ? `empleado/productos/${p.imagen}` : '';
-    const imgHtml = imgSrc ? `<img src="${escaparHtml(imgSrc)}" alt="${escaparHtml(p.nombre)}" class="img-preview-tabla">` : '<span>Sin foto</span>';
-
-    tr.innerHTML = `
-      <td class="col-id">${p.id_producto}</td>
-      <td class="col-img">${imgHtml}</td>
-      <td class="col-nombre">${escaparHtml(p.nombre)}</td>
-      <td class="col-tipo">${escaparHtml(p.tipo)}</td>
-      <td class="col-precio">${Number(p.precio_base).toFixed(2)}</td>
-      <td class="col-desc">${escaparHtml(p.descripcion)}</td>
-      <td class="col-permite">${p.permitir_ingredientes ? 'Sí' : 'No'}</td>
-      <td class="col-acciones">
-        <div class="action-group">
-          <button type="button" class="btn-editar" data-id="${p.id_producto}">Editar</button>
-          <button type="button" class="btn-borrar" data-id="${p.id_producto}">Borrar</button>
-        </div>
-      </td>`;
-    tbody.appendChild(tr);
-  });
-
-  tabla.appendChild(tbody);
-  listaEl.appendChild(tabla);
-}
+// Visualización estática, no se necesita mostrarLista
 
 // --- Formulario ---
 // crearSelectTiposHTML: arma el select de tipos para el formulario
@@ -117,7 +62,7 @@ function controlarPermitirIngredientes(form) {
     chkBlock.style.display = esPermitido ? 'flex' : 'none';
     if (!esPermitido) chkBlock.querySelector('input').checked = false; // cuidado, resetea si no es pizza/hamburguesa
   };
-  selTipo.addEventListener('change', actualizar);
+  selTipo?.addEventListener('change', actualizar);
   actualizar();
 }
 
@@ -128,7 +73,7 @@ function manejarPreviewImagen(form) {
   if (!inputFile || !previewImg) return;
   if (!previewImg.getAttribute('src')) previewImg.style.display = 'none';
 
-  inputFile.addEventListener('change', e => {
+  inputFile?.addEventListener('change', e => {
     const file = e.target.files[0];
     const fileNameSpan = form.querySelector('.file-name');
     if (file) {
@@ -178,60 +123,162 @@ function renderizarFormulario(cont, titulo, p = {}) {
   controlarPermitirIngredientes(form); // cuidado: esto oculta el checkbox si no es pizza/hamburguesa
   manejarPreviewImagen(form);
 
-  form.querySelector('#btnCancelar').addEventListener('click', mostrarLista); // vuelve a la lista sin enviar
-  form.addEventListener('submit', async e => {
+  const btnCancelar = form.querySelector('#btnCancelar');
+  // btnCancelar?.addEventListener('click', () => {}); // cancel, do nothing
+  form?.addEventListener('submit', async e => {
     e.preventDefault();
     const endpoint = esEditar ? 'editar_producto.php' : 'agregar_producto.php';
     const res = await fetchJson(endpoint, { method: 'POST', body: new FormData(form) });
-    if (res?.ok) mostrarLista(); // después de guardar recarga la lista
+    if (res?.ok) location.reload(); // después de guardar recarga la página
   });
 }
 
 // funciones helper para mostrar forms
-function mostrarFormAgregar() { renderizarFormulario(document.getElementById('formulario'), 'Agregar Producto'); }
-function mostrarFormEditar(producto) { renderizarFormulario(document.getElementById('formulario'), 'Editando', producto); }
+function mostrarFormAgregar() {
+  const cont = document.getElementById('formulario');
+  if (cont) renderizarFormulario(cont, 'Agregar Producto');
+}
+function mostrarFormEditar(producto) {
+  const cont = document.getElementById('formulario');
+  if (cont) renderizarFormulario(cont, 'Editando', producto);
+}
+
+// Función para filtrar productos
+function filtrarProductos() {
+  const searchInput = document.getElementById('searchInput');
+  const query = searchInput ? searchInput.value.toLowerCase() : '';
+  const filterTipo = document.getElementById('filterTipo');
+  const tipoFilter = filterTipo ? filterTipo.value : '';
+  const filterPermit = document.getElementById('filterPermit');
+  const permitFilter = filterPermit ? filterPermit.value : '';
+  const sections = document.querySelectorAll('.product-section');
+
+  sections.forEach(section => {
+    const items = section.querySelectorAll('div[data-name]');
+    let hasVisible = false;
+    items.forEach(item => {
+      const name = item.getAttribute('data-name');
+      const tipo = item.getAttribute('data-tipo');
+      const permitir = item.getAttribute('data-permitir');
+
+      const matchesName = name.includes(query);
+      const matchesTipo = tipoFilter === '' || tipo === tipoFilter;
+      const matchesPermit = permitFilter === '' || permitir === permitFilter;
+
+      const visible = matchesName && matchesTipo && matchesPermit;
+      item.style.display = visible ? 'block' : 'none';
+      if (visible) hasVisible = true;
+    });
+    section.style.display = hasVisible ? 'block' : 'none';
+  });
+}
+
+// Función para limpiar filtros
+function limpiarFiltros() {
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.value = '';
+  const filterTipo = document.getElementById('filterTipo');
+  if (filterTipo) filterTipo.value = '';
+  const filterPermit = document.getElementById('filterPermit');
+  if (filterPermit) filterPermit.value = '';
+  filtrarProductos();
+}
 
 // --- Inicialización de eventos ---
-document.addEventListener('DOMContentLoaded', () => {
-  const listaEl = document.getElementById('lista');
+// Delegación de eventos: se agrega una sola vez
+document.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-id]');
+  if (!btn) return;
+  const id = btn.dataset.id;
 
-  // Delegación de eventos: se agrega una sola vez (cuidado, no poner esto dentro de mostrarLista)
-  listaEl.addEventListener('click', e => {
-    const btn = e.target.closest('button[data-id]');
-    if (!btn) return;
-    const id = btn.dataset.id;
+  if (btn.classList.contains('btn-editar')) {
+    // buscamos el producto para editar y lo pasamos al form
+    fetchJson('listar_productos.php').then(datos => {
+      const prod = datos.find(p => p.id_producto == id);
+      if (prod) mostrarFormEditar(prod);
+    });
+  } else if (btn.classList.contains('btn-borrar')) {
+    // cuidado: confirm dispara ventana, no acumular eventos por usar addEventListener en cada render
+    if (confirm('¿Seguro que querés borrar el producto?')) {
+      const fd = new FormData();
+      fd.append('id_producto', id);
 
-    if (btn.classList.contains('btn-editar')) {
-      // buscamos el producto para editar y lo pasamos al form
-      fetchJson('listar_productos.php').then(datos => {
-        const prod = datos.find(p => p.id_producto == id);
-        if (prod) mostrarFormEditar(prod);
+      fetchJson('borrar_producto.php', {
+        method: 'POST',
+        body: fd
+      }).then(res => {
+        if (res?.ok) {
+          // Eliminamos la card inmediatamente
+          const card = btn.closest('.product-card');
+          if (card) {
+            card.parentElement.remove();
+          }
+
+          mostrarMensaje('Producto eliminado con éxito', 'success');
+        } else if (res?.error) {
+          mostrarMensaje(res.error, 'error');
+        } else {
+          mostrarMensaje('Error al eliminar el producto', 'error');
+        }
       });
-    } else if (btn.classList.contains('btn-borrar')) {
-      // cuidado: confirm dispara ventana, no acumular eventos por usar addEventListener en cada render
-      if (confirm('¿Seguro que querés borrar el producto?')) {
-        const fd = new FormData();
-        fd.append('id_producto', id);
-        fetchJson('borrar_producto.php', { method: 'POST', body: fd }).then(res => res?.ok && mostrarLista());
-      }
     }
-  });
-
-  // botones de ver, agregar, volver
-  document.getElementById('btnVer').addEventListener('click', mostrarLista);
-  document.getElementById('btnAgregar').addEventListener('click', mostrarFormAgregar);
-  document.getElementById('volver').addEventListener('click', () => location.href = '../menu.php');
-
-  // filtros: input/search/select, con debounce
-  ['searchInput', 'filterTipo', 'filterPermit'].forEach(id => document.getElementById(id)?.addEventListener('input', debounceMostrar));
-
-  // limpiar filtros
-  document.getElementById('clearFilters')?.addEventListener('click', () => {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('filterTipo').value = '';
-    document.getElementById('filterPermit').value = '';
-    mostrarLista();
-  });
-
-  mostrarLista(); // al cargar, mostramos la lista
+  }
 });
+
+// botones de agregar, volver, buscar, limpiar, ver
+const btnAgregar = document.getElementById('btnAgregar');
+if (btnAgregar) btnAgregar.addEventListener('click', mostrarFormAgregar);
+
+const btnBuscar = document.getElementById('btnBuscar');
+if (btnBuscar) btnBuscar.addEventListener('click', filtrarProductos);
+
+const clearFilters = document.getElementById('clearFilters');
+if (clearFilters) clearFilters.addEventListener('click', limpiarFiltros);
+
+const btnVer = document.getElementById('btnVer');
+if (btnVer) btnVer.addEventListener('click', () => window.location.href = '../../cliente/products.php');
+
+const volver = document.getElementById('volver');
+if (volver) volver.addEventListener('click', () => location.href = '../menu.php');
+
+// Agregar listener de eventos para input de búsqueda
+document.getElementById('searchInput').addEventListener('input', e => {
+  const query = e.target.value.toLowerCase();
+  const sections = document.querySelectorAll('.product-section');
+  sections.forEach(section => {
+    const items = section.querySelectorAll('div[data-name]');
+    let hasVisible = false;
+    items.forEach(item => {
+      const name = item.getAttribute('data-name');
+      const match = name.includes(query);
+      item.style.display = match ? 'block' : 'none';
+      if (match) hasVisible = true;
+    });
+    section.style.display = hasVisible ? 'block' : 'none';
+  });
+});
+
+// Inicialización del menú inferior y botón de scroll
+// Obtener los tipos de productos desde la variable global definida en PHP
+const tiposProductos = window.tiposProductos || [];
+
+// Poblar el menú inferior con botones para cada tipo de producto
+const productosButtons = document.getElementById('productos-buttons');
+if (tiposProductos && productosButtons) {
+  // Iterar sobre cada tipo y crear un botón
+  tiposProductos.forEach(tipo => {
+    const btn = document.createElement('button');
+    btn.className = 'section-button';
+    btn.textContent = tipo;
+    // Event listener para scroll suave hacia la sección correspondiente
+    btn.addEventListener('click', () => {
+      const section = document.getElementById('productos-' + tipo);
+      if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    productosButtons.appendChild(btn);
+  });
+}
+
+// Funcionalidad del botón "volver arriba"
+const scrollToTopBtn = document.getElementById('scrollToTop');
+if (scrollToTopBtn) scrollToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
