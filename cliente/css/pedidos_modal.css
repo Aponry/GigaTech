@@ -1,0 +1,7 @@
+.status.pendiente { background-color: #333333; color: white; }
+.status.confirmado { background-color: #333333; color: white; }
+.status.en_preparacion { background-color: #333333; color: white; }
+.status.listo { background-color: #333333; color: white; }
+.status.en_reparto { background-color: #333333; color: white; }
+.status.entregado { background-color: #333333; color: white; }
+.status.cancelado { background-color: #e74c3c; color: white; }

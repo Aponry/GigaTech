@@ -1,0 +1,275 @@
+.order-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.order-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.order-modal-content {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  transform: translateY(-50px);
+  transition: transform 0.3s ease;
+}
+
+.order-modal.active .order-modal-content {
+  transform: translateY(0);
+}
+
+.order-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.order-modal-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.order-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.3s ease;
+}
+
+.order-modal-close:hover {
+  color: #333;
+}
+
+.order-modal-body {
+  padding: 20px;
+}
+
+.order-info {
+  margin-bottom: 20px;
+}
+
+.order-info h3 {
+  margin-top: 0;
+  color: #1976d2;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.order-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.order-detail {
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+
+.order-detail strong {
+  display: block;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.order-detail span {
+  font-size: 1rem;
+  color: #212529;
+}
+
+.order-status {
+  padding: 10px 15px;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.order-status.pendiente {
+  background-color: #ff9800;
+}
+
+.order-status.cocinando {
+  background-color: #1976d2;
+}
+
+.order-status.entregando {
+  background-color: #9c27b0;
+}
+
+.order-status.entregado {
+  background-color: #4caf50;
+}
+
+.order-status.cancelado {
+  background-color: #f44336;
+}
+
+.order-items {
+  margin-top: 20px;
+}
+
+.order-items h3 {
+  margin-top: 0;
+  color: #1976d2;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.order-item {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.order-item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.order-item-name {
+  font-weight: bold;
+  color: #333;
+}
+
+.order-item-price {
+  color: #1976d2;
+  font-weight: bold;
+}
+
+.order-item-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.order-total {
+  margin-top: 20px;
+  text-align: right;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.order-search {
+  padding: 20px;
+  text-align: center;
+}
+
+.order-search input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 200px;
+  margin-right: 10px;
+}
+
+.order-search button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.order-search button:hover {
+  background-color: #1565c0;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1976d2;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.not-found-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  padding: 20px;
+  border-radius: 5px;
+  margin: 20px 0;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.not-found-message i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+  color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+  .order-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .order-search input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .order-search button {
+    width: 100%;
+  }
+}

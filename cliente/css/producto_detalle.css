@@ -1,0 +1,391 @@
+/* CSS Variables for gray tones matching index.php */
+:root {
+  --detalle-bg: #f8f9fa;
+  --detalle-bg-secondary: #ffffff;
+  --detalle-bg-tertiary: #dee2e6;
+  --detalle-text: #000000;
+  --detalle-muted: #6c757d;
+  --detalle-accent: #333333;
+  --detalle-accent-2: #555555;
+  --detalle-border: #dee2e6;
+}
+
+/* Body and general styles */
+body {
+   background-color: var(--detalle-bg);
+   font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+   margin: 0;
+   padding: 1rem 1rem 5rem 1rem;
+}
+
+/* Header styles - removed as using modal.css header */
+
+/* Section buttons and cart toggle - removed as using modal.css styles */
+
+/* Main content layout - removed as using modal.css body styles */
+
+.product-section {
+   flex: 0 0 400px;
+   background-color: var(--detalle-bg-secondary);
+   padding: 1rem;
+   border-radius: 12px;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-image-container {
+  text-align: center;
+}
+
+.product-image {
+   width: 100%;
+   max-width: 300px;
+   height: auto;
+   border-radius: 12px;
+   margin-bottom: 1rem;
+}
+
+.product-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--detalle-text);
+  margin-bottom: 0.5rem;
+}
+
+.product-description {
+  color: var(--detalle-muted);
+  margin-bottom: 1rem;
+}
+
+.product-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--detalle-accent);
+  margin-bottom: 1rem;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.add-to-cart-btn {
+   background-color: var(--detalle-accent);
+   color: var(--detalle-bg-secondary);
+   border: none;
+   padding: 0.75rem 1.5rem;
+   border-radius: 8px;
+   cursor: pointer;
+   font-weight: bold;
+   width: 100%;
+   transition: background-color 0.3s;
+}
+
+.add-to-cart-btn:hover {
+   background-color: var(--detalle-accent-2);
+}
+
+/* Horizontal container for sections */
+.horizontal-container {
+   display: flex;
+   overflow-x: auto;
+   gap: 2rem;
+   padding: 1rem 0;
+   scroll-behavior: smooth;
+   justify-content: center;
+   align-items: flex-start;
+}
+
+/* Ingredients section */
+.ingredients-section {
+   flex: 0 0 250px;
+   background-color: var(--detalle-bg-secondary);
+   padding: 0.75rem;
+   border-radius: 12px;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ingredients-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--detalle-muted) transparent;
+}
+
+.ingredient-item {
+  flex: 0 0 auto;
+  min-height: 100px;
+  min-width: 140px;
+  background-color: var(--detalle-bg-tertiary);
+  border: 1px solid var(--detalle-border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+
+.ingredient-item:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  background-color: #e9ecef;
+}
+
+.ingredient-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.ingredient-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Removed checkbox styles */
+
+.ingredient-name {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--detalle-text);
+  text-align: center;
+  line-height: 1.2;
+  font-family: Arial, sans-serif;
+  margin-bottom: 0.25rem;
+}
+
+.ingredient-price {
+  font-size: 0.75rem;
+  color: var(--detalle-accent);
+  text-align: center;
+  line-height: 1.2;
+  font-family: Arial, sans-serif;
+}
+
+/* Suggestions section */
+.suggested-section {
+   flex: 0 0 250px;
+   background-color: var(--detalle-bg-secondary);
+   padding: 0.75rem;
+   border-radius: 12px;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.suggested-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.suggested-item {
+  min-height: 140px;
+  background-color: var(--detalle-bg-secondary);
+  border: 1px solid var(--detalle-border);
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+
+.suggested-item:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  background-color: #f8f9fa;
+}
+
+.suggested-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.suggested-item img {
+  width: 80px;
+  height: auto;
+  border-radius: 4px;
+}
+
+.suggested-item p {
+  margin: 0;
+  text-align: center;
+  line-height: 1.2;
+  font-family: Arial, sans-serif;
+}
+
+.suggested-item p:first-of-type {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--detalle-text);
+}
+
+.suggested-item p:last-of-type {
+  font-size: 0.7rem;
+  color: var(--detalle-accent);
+}
+
+.add-suggested {
+   background-color: var(--detalle-accent);
+   color: var(--detalle-bg-secondary);
+   border: none;
+   padding: 0.5rem 1rem;
+   border-radius: 8px;
+   cursor: pointer;
+   font-weight: bold;
+   width: 100%;
+   transition: background-color 0.3s;
+}
+
+.add-suggested:hover {
+   background-color: var(--detalle-accent-2);
+}
+
+/* Cart panel - removed to use the one from carrito.css */
+
+/* Cart styles removed - using carrito.css styles */
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .horizontal-container {
+    flex-direction: column;
+    overflow-x: visible;
+  }
+
+  .ingredients-list {
+    grid-template-columns: 1fr;
+  }
+
+  .suggested-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ingredient-item,
+  .suggested-item {
+    flex: none;
+    width: 100%;
+  }
+
+  .cart-panel {
+    width: 100%;
+    height: auto;
+    position: relative;
+    transform: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .ingredients-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Quantity controls styles */
+.quantity-controls .qty-btn {
+   background-color: var(--detalle-accent);
+   color: var(--detalle-bg-secondary);
+   border: none;
+   width: 25px;
+   height: 25px;
+   border-radius: 8px;
+   cursor: pointer;
+   font-size: 1rem;
+   font-weight: bold;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   transition: all 0.3s ease;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Smaller buttons for suggested items */
+.suggested-item .quantity-controls .qty-btn {
+  width: 18px;
+  height: 18px;
+  font-size: 0.8rem;
+}
+
+.suggested-item .quantity-controls input {
+  width: 35px;
+  padding: 0.2rem;
+}
+
+.suggested-item .quantity-controls {
+  gap: 0.2rem;
+}
+
+.quantity-controls .qty-btn:hover {
+  background-color: var(--detalle-accent-2);
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.quantity-controls .qty-btn:active {
+  transform: scale(0.95);
+}
+
+.quantity-controls input {
+   width: 50px;
+   text-align: center;
+   padding: 0.25rem;
+   border: 1px solid var(--detalle-border);
+   border-radius: 8px;
+   background-color: var(--detalle-bg-secondary);
+   color: var(--detalle-text);
+   font-weight: bold;
+   transition: all 0.3s ease;
+}
+
+.quantity-controls input:focus {
+  outline: none;
+  border-color: var(--detalle-accent);
+  box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.1);
+}
+
+.quantity-controls input:hover {
+  border-color: var(--detalle-accent);
+}
+
+/* Scrollbar styles for webkit browsers */
+.ingredients-list::-webkit-scrollbar,
+.suggested-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ingredients-list::-webkit-scrollbar-track,
+.suggested-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ingredients-list::-webkit-scrollbar-thumb,
+.suggested-grid::-webkit-scrollbar-thumb {
+  background: var(--detalle-muted);
+  border-radius: 3px;
+}
+
+.ingredients-list::-webkit-scrollbar-thumb:hover,
+.suggested-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--detalle-accent);
+}
