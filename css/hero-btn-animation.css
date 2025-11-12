@@ -1,0 +1,45 @@
+/* Animación para el botón "Ver Menú" en la sección hero */
+/* Movimiento sutil hacia abajo al hacer hover o click, suave y consistente con la paleta original del sitio */
+
+.hero-btn {
+    /* Estilos base del botón */
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: white; /* Fondo blanco original */
+    color: #333333; /* Color gris oscuro original */
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición suave para el movimiento y sombra */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil para profundidad */
+}
+
+/* Animación al hacer hover: mover ligeramente hacia abajo */
+.hero-btn:hover {
+    transform: translateY(5px); /* Movimiento hacia abajo de 5px */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada para efecto de presión */
+    background-color: #f8f9fa; /* Fondo gris claro original */
+}
+
+/* Animación al hacer click (active): mantener el movimiento hacia abajo */
+.hero-btn:active {
+    transform: translateY(5px); /* Movimiento hacia abajo de 5px */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Sombra reducida para efecto de presión */
+}
+
+/* Animación deslizante para el botón al hacer click */
+.hero-btn.sliding-down {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(10px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
