@@ -4,4 +4,5 @@ y para hacer una mini guía de instalación local de dicha página y dejar en pe
 de forma local.*//
 
 
-//en este proyecto usamos los siguientes lenguajes, html, css , php y mysql
+//*en este proyecto usamos los siguientes lenguajes, html, css , php y mysql
+//*el html fue usado para crear la pagina, el css fue creado para el estilo de la pagina, php fue usado para poder hacer las consultas a la base de datos , por ultimo el mysql fue usado para crear dicha base de datos
